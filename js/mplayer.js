@@ -1,6 +1,6 @@
 ;(function($) {
 	function Mplayer (element) {
-		this.target = element;
+		this.element = element;
 		this.Version = "0.1.0";
 		this.events = {};
 		this.methods = {};
@@ -15,8 +15,6 @@
 			this.prototype[i] = obj[i];
 		}
 	};
-
-	Mplayer.fn = Mplayer.prototype;
 
 	Mplayer.handleList = function (list, dist) {
 		var finalList;
@@ -70,13 +68,13 @@
 	};
 
 	Mplayer.eventHandler = function () {
-		var event, target, optionalValue, arr;
+		var event, element, optionalValue, arr;
 		for (var i in this.events) {
 			arr = i.split(" ");
-			target = arr[0];
+			element = arr[0];
 			event = arr[1];
 			optionalValue = arr[2];
-			$(target).on(event, optionalValue, this.methods[this.events[i]]);
+			$(element).on(event, optionalValue, this.methods[this.events[i]]);
 		}
 	};
 
@@ -193,6 +191,7 @@
 			duration: 0,
 			remaining: 0
 		},
+
 
 		loadTrack: function (i, playlist) {
 			var self = this,
@@ -335,6 +334,17 @@
 			t.find(".mplayer-btn-loop").on("click", function () {
 				self.loopTrack();
 			});
+		},
+
+		getStatus: function (element) {
+			this.status.src = element.src;
+			this.status.currentTime = element.currentTime;
+			this.status.duration = element.duration;
+			this.status.remaining = element.duration - element.currentTime;
+		},
+
+		updateProgress: function () {
+			
 		},
 
 		extend: function (obj) {
