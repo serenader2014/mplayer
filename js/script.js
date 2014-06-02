@@ -5,5 +5,5 @@
 
 	p1.initialize([
 		"Jay Sean - What Happened To Us"
-		]);
+		], false);
 })(jQuery);
