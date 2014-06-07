@@ -1,382 +1,104 @@
-;(function($) {
-	function Mplayer (element) {
-		this.element = element;
+;(function ($, window, undefined) {
+	$.fn.Mplayer = function () {
+		return new $.Mplayer(this);
+	};
+
+	$.Mplayer = function (e) {
 		this.Version = "0.1.0";
-		this.events = {};
-		this.methods = {};
-		this.playlist = {};
+		this.element = e;
+		this.audio = this.element.find("audio");
+		this.playlist = [];
 		this.currentTrack = 0;
-		this.isPlaying = false;
-		this.loop = 0;
-	}
-
-	Mplayer.extend = function (obj) {
-		for (var i in obj) {
-			this.prototype[i] = obj[i];
-		}
+		this.count = $.Mplayer.count++;
 	};
 
-	Mplayer.handleList = function (list, dist) {
-		var finalList;
+	$.Mplayer.count = 0;
 
-		if ($.isArray(list)) {
-			finalList = [];
-			list.forEach(function (item, index, array) {
-
-				if (item.indexOf("http") !== -1) {
-					finalList.push({
-						title: item.substring(item.lastIndexOf("-") + 1, item.lastIndexOf(".")),
-						artist: item.substring(item.lastIndexOf("/") + 1, item.lastIndexOf("-")),
-						mp3: item.substring(0, item.lastIndexOf(".")) + ".mp3",
-						ogg: item.substring(0, item.lastIndexOf(".")) + ".ogg",
-						cover: item.substring(0, item.lastIndexOf(".")) + ".jpg"
-					});
-
-				} else {
-
-					finalList.push({
-						title: item.substring(item.indexOf("-") + 1, item.length),
-						artist: item.substring(0, item.indexOf("-")),
-						mp3: dist + item + ".mp3",
-						ogg: dist + item + ".ogg",
-						cover: dist + item + ".jpg"
-					});
-
-				}
-			});
-		} else {
-			if (list.indexOf("http") !== -1) {
-				finalList = {
-					title: list.substring(list.lastIndexOf("-") + 1, list.lastIndexOf(".")),
-					artist: list.substring(list.lastIndexOf("/") + 1, list.lastIndexOf("-")),
-					mp3: list.substring(0, list.lastIndexOf(".")) + ".mp3",
-					ogg: list.substring(0, list.lastIndexOf(".")) + ".ogg",
-					cover: list.substring(0, list.lastIndexOf(".")) + ".jpg"
-				};
-			} else {
-				finalList = {
-					title: list.substring(list.indexOf("-") + 1, list.length),
-					artist: list.substring(0, list.indexOf("-")),
-					mp3: dist + list + ".mp3",
-					ogg: dist + list + ".ogg",
-					cover: dist + list + ".jpg"
-				};
-			}
-		}
-
-		return finalList;
-	};
-
-	Mplayer.eventHandler = function () {
-		var event, element, optionalValue, arr;
-		for (var i in this.events) {
-			arr = i.split(" ");
-			element = arr[0];
-			event = arr[1];
-			optionalValue = arr[2];
-			$(element).on(event, optionalValue, this.methods[this.events[i]]);
-		}
-	};
-
-	Mplayer.prototype = {
-		initialize: function (list, isUerDefined, config) {
+	$.Mplayer.prototype = {
+		initialize: function (list) {
 			var self = this;
-			var $container,
-				$main,
-				$controllBtn,
-				$playBtn,
-				$pauseBtn,
-				$nextBtn,
-				$prevBtn,
-				$shuffleBtn,
-				$loopBtn,
-				$audio,
-				$playlist,
-				playlist,
-				fileDirectory = "audios/";
-			// {
-			// 	trackDetails: [
-			// 	{
-			// 		"title": "",
-			// 		"artist": "",
-			// 		"mp3": "",
-			// 		"ogg": "",
-			// 		"cover": ""
-			// 	},
-			// 	{
-			// 		"title": "",
-			// 		"artist": "",
-			// 		"mp3": "",
-			// 		"ogg": "",
-			// 		"cover": ""
-			// 	}
-			// 	],
-			// 	fileDirectory: "",
-			// 	loop: "",
-			// 	shuffle: "",
-			// 	autoPlay: "",
-			// 	...
-			// }
-			playlist  = this.playlist = Mplayer.handleList(list, fileDirectory);
-			if (config) {
-				if (config.trackDetails && $.isArray(config.trackDetails)) {
-					config.trackDetails.forEach(function (item, index, array) {
-						for (var i in item) {
-							playlist[index][i] = self.playlist[index][i] = item[i];
-						}
-					});
-				}
 
-				if (config.fileDirectory) {
-					fileDirectory = config.fileDirectory;
-				}
-
-				if (config.loop) {
-					this.loop = config.loop;
-				}
-
-				if (config.shuffle) {
-					this.shuffleList();
-				}
-			}
-
-
-			if (isUerDefined === false) {
-				$audio = $("<audio preload = 'true' class='mplayer-audio'></audio>");
-				$audio.append("<source></source><source></source>");
-				$container = $("<div class='mplayer'></div>");
-				$main = $("<div class='mplayer-main'></div>");
-				$controllBtn = $("<div class='mplayer-controll'></div>");
-				$playBtn = $("<span><a class='mplayer-btn mplayer-btn-play'href='javascript:;'>Play</a></span>");
-				$pauseBtn = $("<span><a class='mplayer-btn mplayer-btn-pause' href='javascript:;'>Pause</a></span>");
-				$nextBtn = $("<span><a class='mplayer-btn mplayer-btn-next'href='javascript:;'>Next</a></span>");
-				$prevBtn = $("<span><a class='mplayer-btn mplayer-btn-prev'href='javascript:;'>Prev</a></span>");
-				$shuffleBtn = $("<span><a class='mplayer-btn mplayer-btn-shuffle' href='javascript:;'>Shuffle</a></span>");
-				$loopBtn = $("<span><a class='mplayer-btn mplayer-btn-loop' href='javascript:;'>Loop</a></span>");
-				$playlist = $("<div class='mplayer-playlist'></div>");
-
-				$controllBtn.append($playBtn).append($pauseBtn).append($nextBtn).append($prevBtn).append($shuffleBtn).append($loopBtn);
-				$container.append($main).append($playlist);
-				$main.append($controllBtn);
-				this.element.append($container);
-			} else if (isUerDefined === true) {
-				$container = this.element.find(".mplayer");
-				$main = this.element.find(".mplayer-main");
-				$controllBtn = this.element.find(".mplayer-controll");
-				$playlist = this.element.find(".mplayer-playlist");
-			}
-
-			
-			this.playlist.forEach(function (item, index, array) {
-				$playlist.append("<li><a href='javascript:;'>" + index + ". " + item.artist + " - " + item.title + "</a></li>");
+			list.forEach(function (item, index) {
+				self.playlist.push(item);
 			});
-			$main.append($audio);
 
-			this.loadTrack(0, playlist);
+			this.createView();
 			this.defaultEventBinding();
-
 			return this;
 		},
 
-		options: {
-			idPrefix: "mplayer",
-			mediaSrc: "audios/",
-			volume: 0.8,
-			muted: false
-		},
-
-		status: {
-			src: "",
-			currentTime: 0,
-			duration: 0,
-			remaining: 0
-		},
-
-
-		loadTrack: function (i, playlist) {
-			var self = this,
-				$audio = this.element.find("audio");
-			$audio.find("source").eq(0).attr("src", playlist[i].mp3);
-			$audio.find("source").eq(1).attr("src", playlist[i].ogg);
-
-			$audio.on("ended", function () {
-				self.next();
-			});
-		},
-
-		switchTrack: function () {
-			var self = this,
-				$audio = self.element.find("audio"),
-				current = self.playlist[self.currentTrack];
-			self.element.find("source").eq(0).attr("src", current.mp3);
-			self.element.find("source").eq(1).attr("src", current.ogg);
-			self.element.find("audio")[0].load();
-			$audio.on("progress", function () {
-				$audio.on("canplay", function () {
-					self.play();
-				});
-			});
-
-			return this;
-		},
-
-		play: function () {
-			this.element.find("audio")[0].play();
-			this.isPlaying = true;
-			console.log(this.loop);
-			console.log(this.currentTrack);
-
-			return this;
+		play: function () { 
+			this.audio[0].play();
 		},
 
 		pause: function () {
-			this.element.find("audio")[0].pause();
-			this.isPlaying = false;
-
-			return this;
+			this.audio[0].pause();
 		},
 
 		next: function () {
-			if (this.loop === 2) {
-				this.switchTrack(this.currentTrack);
+			if (this.currentTrack === this.playlist.length - 1) {
+				return false;
 			} else {
-				if (this.currentTrack >= this.playlist.length - 1) {
-					if (this.loop === 0) return;
-					if (this.loop === 1) {
-						this.currentTrack = 0;
-						this.switchTrack();
-					}
-				} else {
-					this.currentTrack = this.currentTrack + 1;
-					this.switchTrack(this.currentTrack);
-				}
+				this.currentTrack = this.currentTrack + 1;
+				this.switchTrack(this.currentTrack);
 			}
-
-
-			return this;
 		},
 
 		prev: function () {
-			if (this.loop === 2) {
-				this.switchTrack(this.currentTrack);
+			if (this.currentTrack === 0) {
+				return false;
 			} else {
-				if (this.currentTrack <= 0) {
-					if (this.loop === 0) return;
-					if (this.loop === 1) {
-						this.currentTrack = this.playlist.length - 1;
-						this.switchTrack();
-					}
-				} else {
-					this.currentTrack = this.currentTrack - 1;
-					this.switchTrack(this.currentTrack);
-				}
+				this.currentTrack = this.currentTrack - 1;
+				this.switchTrack(this.currentTrack);
 			}
-
-			return this;
 		},
 
-		shuffleList: function () {
+		loadTrack: function () {
+
+		},
+
+		switchTrack: function (i) {
 			var self = this;
-			//Fisher-Yates Shuffle Algorithm
-			var k, t, l = this.playlist.length;
-			if (l < 2) {
-				return;
-			}
-
-			while (l) {
-				k = Math.floor(Math.random() * l--);
-				t = this.playlist[l];
-				this.playlist[l] = this.playlist[k];
-				this.playlist[k] = t;
-			}
-
-			this.currentTrack = -1;
-			this.element.find(".mplayer-playlist").html("");
-			this.playlist.forEach(function (item, index, array) {
-				self.element.find(".mplayer-playlist").append("<li><a href='javascript:;'>" + index + ". " + item.artist + " - " + item.title + "</a></li>");
+			this.audio.find("source").eq(0).attr("src", this.playlist[i]);
+			this.audio[0].load();
+			this.audio.on("canplay", function () {
+				self.play();
 			});
 		},
 
-		loopTrack: function () {
-			if (this.loop === 0) {
-				this.loop = 1;
-			} else if (this.loop === 1) {
-				this.loop = 2;
-			} else if (this.loop === 2) {
-				this.loop = 0;
-			}
+		createView: function () {
+			var MGUI = {};
+			MGUI.mplayer = $("<div class='mplayer mplayer-" + this.count + "'></div>");
+			MGUI.main = $("<div class='mplayer-main'></div>");
+			MGUI.playlist = $("<div class='mplayer-playlist'></div>");
+			MGUI.audio = $("<audio class='mplayer-audio'></audio>");
+			MGUI.source = $("<source></source><source></source>");
+			MGUI.controll = $("<div class='mplayer-controll'></div>");
+			MGUI.play = $("<span><a class='mplayer-btn-play' href='javascript:;'>PLAY</a></span>");
+			MGUI.pause = $("<span><a class='mplayer-btn-pause' href='javascript:;'>PAUSE</a></span>");
+			MGUI.next = $("<span><a class='mplayer-btn-next' href='javascript:;'>NEXT</a></span>");
+			MGUI.prev = $("<span><a class='mplayer-btn-prev' href='javascript:;'>PREV</a></span>");
+
+			MGUI.audio.append(MGUI.source).find("source").eq(0).attr("src", this.playlist[0]);
+			MGUI.controll.append(MGUI.play).append(MGUI.pause).append(MGUI.next).append(MGUI.prev);
+			this.element.append(MGUI.mplayer.append(MGUI.main).append(MGUI.playlist));
+			MGUI.main.append(MGUI.audio).append(MGUI.controll);
+
+			return this;
 		},
 
 		defaultEventBinding: function () {
-			var self = this,
-				t = this.element;
+			var e = this.element,
+				self = this;
 
-			t.find(".mplayer-btn-play").on("click", function () {
-				self.play();
+			e.find(".mplayer-btn-play").on("click", function () {
+				//self.play();
+				console.log(self);
 			});
 
-			t.find(".mplayer-btn-pause").on("click", function () {
+			e.find(".mplayer-btn-pause").on("click", function () {
 				self.pause();
 			});
-
-			t.find(".mplayer-btn-next").on("click", function () {
-				self.next();
-			});
-
-			t.find(".mplayer-btn-prev").on("click", function () {
-				self.prev();
-			});
-
-			t.find(".mplayer-btn-shuffle").on("click", function () {
-				self.shuffleList();
-			});
-
-			t.find(".mplayer-btn-loop").on("click", function () {
-				self.loopTrack();
-			});
-		},
-
-		getStatus: function (element) {
-			this.status.src = element.src;
-			this.status.currentTime = element.currentTime;
-			this.status.duration = element.duration;
-			this.status.remaining = element.duration - element.currentTime;
-		},
-
-		updateProgress: function () {
-			
-		},
-
-		extend: function (obj) {
-			if (Object.prototype.toString.call(obj) === "[object Object]") {
-				var extended = obj.extended;
-
-				if (obj.events) {
-					for (var i in obj.events) {
-						this.events[i] = obj.events[i];
-					}
-				}
-
-				if (obj.methods) {
-					for (var j in obj.methods) {
-						this.methods[j] = obj.methods[j];
-					}
-				}
-
-				for (var k in obj) {
-					this[k] = obj[k];
-				}
-
-				if (extended) {
-					extended();
-				}
-			}
-
-			return this;
 		}
 	};
-
-	$.extend({
-		Mplayer: Mplayer
-	});
-})(jQuery);
+})(jQuery, window);

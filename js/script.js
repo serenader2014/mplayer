@@ -1,29 +1,11 @@
-(function($) {
-	var p1 = new $.Mplayer($(".test1"));
-	var p2 = new $.Mplayer($(".test2"));
-	var p3 = new $.Mplayer($(".test3"));
-
-	p2.initialize([
-		"Jay Sean - What Happened To Us",
-		"Jordan Pruitt - In Love For A Day",
-		"Maroon 5 - Won't Go Home Without You",
-		"Pixie Lott - When You Were My Man (Live At The Pool／2013)",
-		"Queensberry - too young",
-
-		], false, {
-			trackDetails: [
-			{
-				title: "test title",
-				artist: "damn",
-			}
-			]
-		});
+	//var p1 = new $.Mplayer($(".test1"));
+	var p1 = $(".test1").Mplayer();
 	p1.initialize([
-		"Shontelle - Impossible",
-		"Snow Patrol - Run - Revised Album Version",
-		"The Vamps - Can We Dance",
-		"Tynisha Keli - You & Me Against The World (Non-Album Track)",
-		"李志 - 和你在一起",
-		"猛虎巧克力 - 别让我孤单"
-		], false);
-})(jQuery);
+		"http://m.ino.im/mp3/Adie-Seek You.mp3",
+		"http://m.ino.im/mp3/Dylan Mondegreen-Something To Dream On.mp3",
+		"http://m.ino.im/mp3/Embrace-Gravity.mp3"
+		]);
+	// var p2 = new $.Mplayer($(".test2"));
+	// p2.initialize(["http://m.ino.im/mp3/Dylan Mondegreen-Something To Dream On.mp3"]);
+	// var p3 = new $.Mplayer($(".test3"));
+	// p3.initialize(["http://m.ino.im/mp3/Embrace-Gravity.mp3"]);
