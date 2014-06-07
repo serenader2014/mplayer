@@ -27,7 +27,7 @@
 			return this;
 		},
 
-		play: function () {
+		play: function () { 
 			this.audio[0].play();
 		},
 
