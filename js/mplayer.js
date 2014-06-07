@@ -45,7 +45,12 @@
 		},
 
 		prev: function () {
-
+			if (this.currentTrack === 0) {
+				return false;
+			} else {
+				this.currentTrack = this.currentTrack - 1;
+				this.switchTrack(this.currentTrack);
+			}
 		},
 
 		loadTrack: function () {
