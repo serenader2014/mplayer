@@ -5,4 +5,5 @@ This is a jQuery plugin that support HTML5 audios with customize controll and pl
 __TODO__
 
 1. GUI
-2. Fix bug
+2. Support multi-player in one page
+3. Support IE 8 and almost modern broswer
