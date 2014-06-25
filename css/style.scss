@@ -1,0 +1,16 @@
+.mplayer {
+    margin: 1rem;
+    background: #eee;
+
+
+    .mplayer-control {
+        a {
+            display: inline-block;
+            margin: 0.2rem;
+        }
+    }
+
+    .mplayer-current {
+        background: #222;
+    }
+}
