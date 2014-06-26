@@ -67,6 +67,32 @@
 			}
 		},
 
+		shuffle: function () {
+			var self = this;
+			//Fisher-Yates Shuffle Algorithm
+			var k, t, l = self.playlist.length, tmp = {};
+			if (l < 2) {
+				return;
+			}
+
+			while (l) {
+				k = Math.floor(Math.random() * l--);
+				t = self.playlist[l];
+				self.playlist[l] = self.playlist[k];
+				self.playlist[k] = t;
+				tmp[l] = k;
+			}
+
+			console.log(tmp);
+
+			self.element.find(".mplayer-playlist").html("");
+			self.playlist.forEach(function (item, index) {
+				self.element.find(".mplayer-playlist")
+					.append($("<li><a class='mplayer-song' href='javascript:;'>" + (index*1+1) +". "+ item+ "</a></li>"));	
+			});
+			//self.defaultEventBinding().switchTrack(0);
+		},
+
 		loadTrack: function () {
 
 		},
@@ -96,18 +122,21 @@
 			MGUI.next = $("<span><a class='mplayer-btn-next' href='javascript:;'>NEXT</a></span>");
 			MGUI.prev = $("<span><a class='mplayer-btn-prev' href='javascript:;'>PREV</a></span>");
 			MGUI.loop = $("<span><a class='mplayer-btn-noloop' href='javascript:;'>LOOP</a></span>");
+			MGUI.shuffle = $("<span><a class='mplayer-btn-shuffle' href='javascript:;'>SHUFFLE</a></span>");
 
 			this.playlist.forEach(function (item, index, arr) {
-				MGUI.playlist.append($("<li><a class='mplayer-song' href='javascript:;'>" + item+ "</a></li>"));
+				MGUI.playlist
+					.append($("<li><a class='mplayer-song' href='javascript:;'>" + (index*1+1) +". "+ item+ "</a></li>"));
 			});
 			MGUI.audio.append(MGUI.source).find("source").eq(0).attr("src", this.playlist[0]);
 			MGUI.controll
 				.append(MGUI.play)
 				.append(MGUI.next)
 				.append(MGUI.prev)
-				.append(MGUI.loop);
-			this.element.append(MGUI.mplayer.append(MGUI.main).append(MGUI.playlist));
+				.append(MGUI.loop)
+				.append(MGUI.shuffle);
 			MGUI.main.append(MGUI.audio).append(MGUI.controll);
+			this.element.append(MGUI.mplayer.append(MGUI.main).append(MGUI.playlist));
 
 			return this;
 		},
@@ -134,6 +163,8 @@
 			}).on("click", ".mplayer-btn-all", function () {
 				self.loop = "false";
 				$(this).removeClass("mplayer-btn-all").addClass("mplayer-btn-noloop").html("LOOP");
+			}).on("click", ".mplayer-btn-shuffle", function () {
+				self.shuffle();
 			});
 
 			e.find(".mplayer-song").each(function (index, item, arr) {
