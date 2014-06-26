@@ -6,6 +6,7 @@
 		this.currentTrack = 0;
 		this.index = Mplayer.count++;
 		this.loop = "false";
+		this.isPlaying = false;
 	};
 
 	Mplayer.count = 0;
@@ -18,51 +19,51 @@
 				self.playlist.push(item);
 			});
 
-			this.createView().defaultEventBinding();
+			this.createView();
 
 			//缓存audio元素，并存储在每个实例中。方便读取
 			//该属性不能直接在 $.Mplayer 里面定义是因为执行 $.Mplayer() 时尚未生成 audio 标签，
 			//故该元素无法获取。在 createView() 方法执行之后再缓存该属性才能正常工作。
 			this.audio = this.element.find("audio");
 
+			//以下两个方法都需要先正确获取 this.audio 元素之后才能正常工作。
+			this.defaultEventBinding().eventListener();
 			return this;
 		},
 
 		play: function () { 
 			this.audio[0].play();
+			this.isPlaying = true;
+			this.audio.trigger("playerOnChanged");
 		},
 
 		pause: function () { 
 			this.audio[0].pause();
+			this.isPlaying = false;
+			this.audio.trigger("playerOnChanged");
 		},
 
 		next: function () {
 			if (this.currentTrack === this.playlist.length - 1) {
 				if (this.loop === "false") {
 					return false;
-				} else if (this.loop === "single") {
-					this.switchTrack(this.currentTrack);
 				} else if (this.loop === "all") {
 					this.switchTrack(0);
 				}
 			} else {
 				this.switchTrack(this.currentTrack + 1);
-			}
-
-			
+			}			
 		},
 
 		prev: function () {
 			if (this.currentTrack === 0) {
 				if (this.loop === "false") {
 					return false;
-				} else if (this.loop === "single") {
-					this.switchTrack(this.currentTrack);
 				} else if (this.loop === "all") {
 					this.switchTrack(this.playlist.length - 1);
 				}
 			} else {
-				this.switchTrack(this.currentTrack -1);
+				this.switchTrack(this.currentTrack - 1);
 			}
 		},
 
@@ -72,15 +73,14 @@
 
 		switchTrack: function (i) {
 			var self = this;
-			console.log(this.element.find(".mplayer-current"));
-			this.element.find(".mplayer-current").removeClass("mplayer-current");
-			console.log(this.element.find(".mplayer-current"));
+			this.element
+				.find(".mplayer-current").removeClass("mplayer-current").end()
+				.find(".mplayer-song").eq(i).addClass("mplayer-current");
 			this.audio.find("source").eq(0).attr("src", this.playlist[i]);
 			this.audio[0].load();
 			this.audio.on("canplay", function () {
 				self.play();
 				self.currentTrack = i;
-				$(self.element.find(".mplayer-song")[i]).addClass("mplayer-current");
 			});
 		},
 
@@ -93,10 +93,9 @@
 			MGUI.source = $("<source></source><source></source>");
 			MGUI.controll = $("<div class='mplayer-control'></div>");
 			MGUI.play = $("<span><a class='mplayer-btn-play' href='javascript:;'>PLAY</a></span>");
-			MGUI.pause = $("<span><a class='mplayer-btn-pause' href='javascript:;'>PAUSE</a></span>");
 			MGUI.next = $("<span><a class='mplayer-btn-next' href='javascript:;'>NEXT</a></span>");
 			MGUI.prev = $("<span><a class='mplayer-btn-prev' href='javascript:;'>PREV</a></span>");
-			MGUI.loop = $("<span class='mplayer-btn-loop'><a class='mplayer-btn-noloop' href='javascript:;'>LOOP</a></span>");
+			MGUI.loop = $("<span><a class='mplayer-btn-noloop' href='javascript:;'>LOOP</a></span>");
 
 			this.playlist.forEach(function (item, index, arr) {
 				MGUI.playlist.append($("<li><a class='mplayer-song' href='javascript:;'>" + item+ "</a></li>"));
@@ -104,7 +103,6 @@
 			MGUI.audio.append(MGUI.source).find("source").eq(0).attr("src", this.playlist[0]);
 			MGUI.controll
 				.append(MGUI.play)
-				.append(MGUI.pause)
 				.append(MGUI.next)
 				.append(MGUI.prev)
 				.append(MGUI.loop);
@@ -118,31 +116,24 @@
 			var e = this.element,
 				self = this;
 
-			e.find(".mplayer-btn-play").on("click", function () {
+			//使用事件委托，因为有些元素是经过脚本修改的，只有通过委托才能获取正确的元素。
+			e.find(".mplayer-control").on("click", ".mplayer-btn-play", function () {
 				self.switchTrack(self.currentTrack);
-			});
-
-			e.find(".mplayer-btn-pause").on("click", function () {
+			}).on("click", ".mplayer-btn-pause", function () {
 				self.pause();
-			});
-
-			e.find(".mplayer-btn-next").on("click", function () {
+			}).on("click", ".mplayer-btn-next", function () {
 				self.next();
-			});
-
-			e.find(".mplayer-btn-prev").on("click", function () {
+			}).on("click", ".mplayer-btn-prev", function () {
 				self.prev();
-			});
-
-			e.find(".mplayer-btn-loop").on("click", ".mplayer-btn-noloop", function () {
+			}).on("click", ".mplayer-btn-noloop", function () {
 				self.loop = "single";
-				$(this).removeClass("mplayer-btn-noloop").addClass("mplayer-btn-single").html("single");
+				$(this).removeClass("mplayer-btn-noloop").addClass("mplayer-btn-single").html("SINGLE");
 			}).on("click", ".mplayer-btn-single", function () {
 				self.loop = "all";
-				$(this).removeClass("mplayer-btn-single").addClass("mplayer-btn-all").html("loop all");
+				$(this).removeClass("mplayer-btn-single").addClass("mplayer-btn-all").html("LOOP ALL");
 			}).on("click", ".mplayer-btn-all", function () {
 				self.loop = "false";
-				$(this).removeClass("mplayer-btn-all").addClass("mplayer-btn-noloop").html("loop");
+				$(this).removeClass("mplayer-btn-all").addClass("mplayer-btn-noloop").html("LOOP");
 			});
 
 			e.find(".mplayer-song").each(function (index, item, arr) {
@@ -150,15 +141,39 @@
 					self.switchTrack(index);
 				});
 			});
-
-			$("audio").on("play", function () {
+			self.audio.on("play", function () {
 				console.log("playing");
 			}).on("pause", function () {
 				console.log("pause");
 			});
 
 			return this;
-		}
+		},
+
+		eventListener: function () {
+			var self = this;
+			self.audio.on("ended", function () {
+				if (self.loop === "single") {
+					self.play();
+				} else {
+					self.next();
+				}
+			});
+
+			self.audio.on("playerOnChanged", function () {
+				if (self.isPlaying) {
+					self.element.find(".mplayer-btn-play")
+						.removeClass("mplayer-btn-play")
+						.addClass("mplayer-btn-pause")
+						.html("PAUSE");
+				} else {
+					self.element.find(".mplayer-btn-pause")
+						.removeClass("mplayer-btn-pause")
+						.addClass("mplayer-btn-play")
+						.html("PLAY");				
+				}
+			});
+		},
 	};
 
 	$.fn.Mplayer = function () {
