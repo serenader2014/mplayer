@@ -16,41 +16,48 @@
 			var self = this,
 				i;
 
-			list.forEach(function (item, index) {
-				if (typeof item === "object") {
-					item.artist = item.artist ? item.artist: "undefined";
-					item.title = item.title ? item.title : "undefined";
-					item.cover = item.cover ? item.cover : "undefined";
-					item.mp3 = item.mp3 ? item.mp3 : "undefined";
-					item.ogg = item.ogg ? item.ogg : "undefined";
-					
-					self.playlist.push(item);
-				} else if (typeof item === "string") {
-					var tmp = {},
-						fileName = item.substring(item.lastIndexOf("/")+1),
-						middleScore = fileName.indexOf("-");
-					if (middleScore !== -1) {
-						tmp.artist = $.trim(fileName.substring(0, middleScore-1));
-						tmp.title = $.trim(fileName.substring(middleScore+1,fileName.lastIndexOf(".")));
-					} else {
-						tmp.artist = "undefined";
-						tmp.title = $.trim(item.substring(item.lastIndexOf(".")));
-					}
-					tmp.cover = item.substring(0,item.lastIndexOf(".")) + ".jpg";
-					tmp.mp3 = item.substring(0,item.lastIndexOf(".")) + ".mp3";
-					tmp.ogg = item.substring(0,item.lastIndexOf(".")) + ".ogg";
+			if ($.isArray(list)) {
+				list.forEach(function (item, index) {
+					if (typeof item === "object") {
+						item.artist = item.artist ? item.artist: "undefined";
+						item.title = item.title ? item.title : "undefined";
+						item.cover = item.cover ? item.cover : "undefined";
+						item.mp3 = item.mp3 ? item.mp3 : "undefined";
+						item.ogg = item.ogg ? item.ogg : "undefined";
+						
+						self.playlist.push(item);
+					} else if (typeof item === "string") {
+						var tmp = {},
+							fileName = item.substring(item.lastIndexOf("/")+1),
+							middleScore = fileName.indexOf("-");
+						if (middleScore !== -1) {
+							tmp.artist = $.trim(fileName.substring(0, middleScore-1));
+							tmp.title = $.trim(fileName.substring(middleScore+1,fileName.lastIndexOf(".")));
+						} else {
+							tmp.artist = "undefined";
+							tmp.title = $.trim(item.substring(item.lastIndexOf(".")));
+						}
+						tmp.cover = item.substring(0,item.lastIndexOf(".")) + ".jpg";
+						tmp.mp3 = item.substring(0,item.lastIndexOf(".")) + ".mp3";
+						tmp.ogg = item.substring(0,item.lastIndexOf(".")) + ".ogg";
 
-					self.playlist.push(tmp);
-				}
-			});
+						self.playlist.push(tmp);
+					}
+				});
+			} else {
+				throw new Error("Invalid playlist.");
+			}
 
 			if (css && typeof css === "object") {
 				for (i in css) {
 					self.css[i] = css[i];
 				}
-				self.updatePlaylist();
 			} else {
-				self.createView().updatePlaylist();
+				self.createView();
+			}
+
+			if (self.playlist.length > 1) {
+				self.updatePlaylist();
 			}
 
 			//缓存audio元素，并存储在每个实例中。方便读取
@@ -169,11 +176,11 @@
 		createView: function () {
 			//缺省模式下自动生成GUI。也可以自写GUI。
 			var MGUI = {},
-				self = this;
+				self = this,
+				length = this.playlist.length;
 
 			MGUI.mplayer = $("<div class='mplayer-" + self.index + " "+self.css.player.substring(1)+"'></div>");
 			MGUI.main = $("<div class='"+self.css.main.substring(1)+"'></div>");
-			MGUI.playlist = $("<div class='"+self.css.playlist.substring(1)+"'></div>");
 			MGUI.audio = $("<audio class='"+self.css.audio.substring(1)+"'></audio>");
 			MGUI.source = $("<source></source><source></source>");
 			MGUI.control = $("<div class='"+self.css.control.substring(1)+"'></div>");
@@ -191,19 +198,27 @@
 				.append($("<span class='"+self.css.currentTime.substring(1)+"'>-:--</span>"))
 				.append($("<span>/</span>"))
 				.append($("<span class='"+self.css.duration.substring(1)+"'>-:--</span>"));
-			MGUI.playlistMenu = $("<span></span>")
-				.append($("<a class='icon-list "+self.css.playlistMenu.substring(1)+"' href='javascript:;'></a>"));
 			MGUI.play = $("<span></span>")
 				.append($("<a class='icon-play "+self.css.play.substring(1)+"' href='javascript:;'></a>"));
-			MGUI.next = $("<span></span>")
-				.append($("<a class='icon-next "+self.css.next.substring(1)+"' href='javascript:;'></a>"));
-			MGUI.prev = $("<span></span>").
-				append($("<a class='icon-prev "+self.css.prev.substring(1)+"' href='javascript:;'></a>"));
 			MGUI.loop = $("<span></span>")
 				.append($("<a class='icon-repeat "+self.css.loop.substring(1)+"' href='javascript:;'></a>"));
-			MGUI.shuffle = $("<span></span>")
-				.append($("<a class='icon-shuffle "+self.css.shuffle.substring(1)+"' href='javascript:;'></a>"));
 			MGUI.cover = $("<img class='"+self.css.cover.substring(1)+"' src=''>");
+
+			//当播放列表只有一首时，不生成以下元素。
+			MGUI.playlist = length > 1 ? $("<div class='"+self.css.playlist.substring(1)+"'></div>") : "";
+
+			MGUI.playlistMenu = length > 1 ? $("<span></span>")
+				.append($("<a class='icon-list "+self.css.playlistMenu.substring(1)+"' href='javascript:;'></a>")) : "";
+
+			MGUI.shuffle = length > 1 ? $("<span></span>")
+				.append($("<a class='icon-shuffle "+self.css.shuffle.substring(1)+"' href='javascript:;'></a>")) : "";
+
+			MGUI.next = length > 1 ? $("<span></span>")
+				.append($("<a class='icon-next "+self.css.next.substring(1)+"' href='javascript:;'></a>")) : "";
+
+			MGUI.prev = length > 1 ? $("<span></span>").
+				append($("<a class='icon-prev "+self.css.prev.substring(1)+"' href='javascript:;'></a>")) : "";
+
 
 			MGUI.audio.append(MGUI.source);
 			MGUI.control
