@@ -48,15 +48,16 @@
 				for (i in css) {
 					self.css[i] = css[i];
 				}
-				self.createPlaylist();
+				self.updatePlaylist();
 			} else {
-				self.createView().createPlaylist();
+				self.createView().updatePlaylist();
 			}
 
 			//缓存audio元素，并存储在每个实例中。方便读取
 			//该属性不能直接在 $.Mplayer 里面定义是因为执行 $.Mplayer() 时尚未生成 audio 标签，
 			//故该元素无法获取。在 createView() 方法执行之后再缓存该属性才能正常工作。
 			self.audio = self.element.find(self.css.audio);
+			self.load(0);
 
 			//以下两个方法都需要先正确获取 this.audio 元素之后才能正常工作。
 			self.defaultEventBinding().eventListener();
@@ -107,6 +108,10 @@
 
 		shuffle: function () {
 			var self = this;
+			self.originalList = [];
+			self.playlist.forEach(function (item, index) {
+				self.originalList[index] = item;
+			});
 			//Fisher-Yates Shuffle Algorithm
 			var k, t, l = self.playlist.length;
 			if (l < 2) {
@@ -120,8 +125,7 @@
 				self.playlist[k] = t;
 			}
 
-			self.element.find(self.css.playlist).html("");
-			self.createPlaylist();
+			self.updatePlaylist();
 			self.element.find(self.css.song).each(function (index, item, arr) {
 				$(item).on("click", function () {
 					self.switchTrack(index);
@@ -131,23 +135,28 @@
 			return this;
 		},
 
-		switchTrack: function (i,isPaused) {
+		load: function (i) {
 			var self = this;
 			self.element
 				.find(self.css.current).removeClass(self.css.current.substring(1)).end()
 				.find(self.css.song).eq(i).addClass(self.css.current.substring(1));
+			self.audio.find("source")
+				.eq(0).attr("src", this.playlist[i].mp3).end()
+				.eq(1).attr("src", this.playlist[i].ogg);
+			self.element.find(self.css.cover).attr("src", self.playlist[i].cover);
+			self.element.find(self.css.artist).html(self.playlist[i].artist).end()
+				.find(self.css.title).html(self.playlist[i].title);
+			
+			return this;
+		},
+
+		switchTrack: function (i,isPaused) {
+			var self = this;
 			if (isPaused) {
 				self.play();
 			} else {
-
-				self.audio.find("source")
-					.eq(0).attr("src", this.playlist[i].mp3).end()
-					.eq(1).attr("src", this.playlist[i].ogg);
-
+				self.load(i);
 				self.currentTrack = i;
-				self.element.find(self.css.cover).attr("src", self.playlist[self.currentTrack].cover);
-				self.element.find(self.css.artist).html(self.playlist[self.currentTrack].artist).end()
-					.find(self.css.title).html(self.playlist[self.currentTrack].title);
 				self.audio[0].load();
 				self.audio.on("canplay", function () {
 					self.play();
@@ -162,14 +171,14 @@
 			var MGUI = {},
 				self = this;
 
-			MGUI.mplayer = $("<div class='mplayer-" + self.index + "'></div>").addClass(self.css.player.substring(1));
+			MGUI.mplayer = $("<div class='mplayer-" + self.index + " "+self.css.player.substring(1)+"'></div>");
 			MGUI.main = $("<div class='"+self.css.main.substring(1)+"'></div>");
 			MGUI.playlist = $("<div class='"+self.css.playlist.substring(1)+"'></div>");
 			MGUI.audio = $("<audio class='"+self.css.audio.substring(1)+"'></audio>");
 			MGUI.source = $("<source></source><source></source>");
 			MGUI.control = $("<div class='"+self.css.control.substring(1)+"'></div>");
-			MGUI.artist = $("<p class='icon-artist "+self.css.artist.substring(1)+"'>"+self.playlist[0].artist+"</p>");
-			MGUI.title = $("<p class='icon-track "+self.css.title.substring(1)+"'>"+self.playlist[0].title+"</p>");
+			MGUI.artist = $("<p class='icon-artist "+self.css.artist.substring(1)+"'></p>");
+			MGUI.title = $("<p class='icon-track "+self.css.title.substring(1)+"'></p>");
 			MGUI.progress = $("<span class='"+self.css.progressBar.substring(1)+"'></span>")
 				.append($("<span class='"+self.css.playedTime.substring(1)+"'></span>"));
 			MGUI.volume = $("<span class='"+self.css.volumeBar.substring(1)+"'></span>")
@@ -179,6 +188,8 @@
 			MGUI.maxVolume = $("<span></span>")
 				.append($("<a class='icon-volume "+self.css.maxVolume.substring(1)+"' href='javascript:;'></a>"));
 			MGUI.time = $("<span class='icon-clock "+self.css.time.substring(1)+"'></span>")
+				.append($("<span class='"+self.css.currentTime.substring(1)+"'>-:--</span>"))
+				.append($("<span>/</span>"))
 				.append($("<span class='"+self.css.duration.substring(1)+"'>-:--</span>"));
 			MGUI.playlistMenu = $("<span></span>")
 				.append($("<a class='icon-list "+self.css.playlistMenu.substring(1)+"' href='javascript:;'></a>"));
@@ -192,11 +203,9 @@
 				.append($("<a class='icon-repeat "+self.css.loop.substring(1)+"' href='javascript:;'></a>"));
 			MGUI.shuffle = $("<span></span>")
 				.append($("<a class='icon-shuffle "+self.css.shuffle.substring(1)+"' href='javascript:;'></a>"));
-			MGUI.cover = $("<img class='"+self.css.cover.substring(1)+"' src='"+self.playlist[0].cover+"'>");
+			MGUI.cover = $("<img class='"+self.css.cover.substring(1)+"' src=''>");
 
-			MGUI.audio.append(MGUI.source).find("source")
-				.eq(0).attr("src", self.playlist[0].mp3).end()
-				.eq(1).attr("src", self.playlist[0].ogg);
+			MGUI.audio.append(MGUI.source);
 			MGUI.control
 				.append(MGUI.artist)
 				.append(MGUI.title)
@@ -217,12 +226,13 @@
 			return this;
 		},
 
-		createPlaylist: function () {
+		updatePlaylist: function () {
 			var self = this;
-			
-			self.element.find(self.css.playlist).append($("<ul>"));
+
+			self.element.find(self.css.playlist+" ul").remove().end()
+				.find(self.css.playlist).append($("<ul>"));
 			self.playlist.forEach(function (item, index, arr) {
-				self.element.find("ul")
+				self.element.find(self.css.playlist+" ul")
 					.append($("<li></li>")
 						.append($("<a href='javascript:;'>" + (index*1+1) +". "+ item.artist + " - " + item.title+ "</a>")
 							.addClass(self.css.song.substring(1))));
@@ -254,6 +264,7 @@
 			playedTime: ".mplayer-played-time",
 			volumeBar: ".mplayer-volume",
 			volumeValue: ".mplayer-volume-value",
+			currentTime: ".mplayer-current-time",
 			duration: ".mplayer-duration",
 			time: ".mplayer-time",
 			mute: ".mplayer-mute",
@@ -277,6 +288,24 @@
 		setVolume: function (i) {
 			this.audio[0].volume = i;
 			return this;
+		},
+
+		getCurrentTime: function () {
+			var self = this;
+			var	currentTime = self.audio[0].currentTime;
+			var	CTMin = currentTime/60 >= 10 ? Math.floor(currentTime/60) : "0" + Math.floor(currentTime/60),
+				CTSec = currentTime%60 >= 10 ? Math.floor(currentTime%60) : "0" + Math.floor(currentTime%60);
+
+			return CTMin+":"+CTSec;
+		},
+
+		getDuration: function () {
+			var self = this;
+			var	duration = self.audio[0].duration;
+			var	DMin = duration/60 >= 10 ? Math.floor(duration/60) : "0" + Math.floor(duration/60),
+				DSec = duration%60 >= 10 ? Math.floor(duration%60) : "0" + Math.floor(duration%60);
+
+			return DMin+":"+DSec;
 		},
 
 		defaultEventBinding: function () {
@@ -358,25 +387,21 @@
 				});
 			});
 
+			var update;
+
 			self.audio.on("play", function () {
 				var currentTime,
-					duration = self.audio[0].duration,
-					CTSec,
-					CTMin,
-					DSec,
-					DMin;
-
-				DMin = Math.floor(duration/60);
-				DSec = Math.floor(duration%60) >= 10 ? Math.floor(duration%60) : "0"+Math.floor(duration%60);
-				e.find(self.css.duration).html(DMin+":"+DSec);
-
-				setInterval(function () {
+					duration = self.audio[0].duration;
+				e.find(self.css.duration).html(self.getDuration());
+				update = setInterval(function () {
 					currentTime = self.audio[0].currentTime;
 					duration = self.audio[0].duration;
+					e.find(self.css.currentTime).html(self.getCurrentTime());
 					e.find(self.css.playedTime).css({"width":(currentTime/duration)*100+"%"});
 					e.find(self.css.volumeValue).css({"width":self.audio[0].volume*4+"rem"});
 				},500);
 			}).on("pause", function () {
+				clearInterval(update);
 			});
 
 			return this;
@@ -409,6 +434,7 @@
 			});
 			return this;
 		},
+
 	};
 
 	$.fn.Mplayer = function () {
