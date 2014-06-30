@@ -15,3 +15,5 @@ var p2 = $(".test2").Mplayer().initialize([
 	"audios/Shontelle - Impossible.mp3",
 	"audios/Tynisha Keli - You & Me Against The World (Non-Album Track).ogg"
 	]);
+
+var p = $(".test3").Mplayer().initialize(["audios/Maroon 5 - Won't Go Home Without You.ogg"]);
