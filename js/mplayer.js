@@ -10,12 +10,20 @@
 	};
 
 	Mplayer.count = 0;
+	Mplayer.message = {
+		isInitialized: "This instance is aleady initialized",
+		isSingleMode: "This instance is in single mode, doesn't support this function.",
+
+	};
 
 	Mplayer.prototype = {
 		initialize: function (list, css) {
 			var self = this,
 				i;
 
+			if (self.element.find(self.css.player).length > 0) {
+				throw new Error(Mplayer.message.isInitialized);
+			}
 			if ($.isArray(list)) {
 				list.forEach(function (item, index) {
 					if (typeof item === "object") {
@@ -87,6 +95,9 @@
 		},
 
 		next: function () {
+			if (this.playlist.length <= 1) {
+				throw new Error(Mplayer.message.isSingleMode);
+			}
 			if (this.currentTrack === this.playlist.length - 1) {
 				if (this.loop === "false") {
 					this.pause();
@@ -101,6 +112,9 @@
 		},
 
 		prev: function () {
+			if (this.playlist.length <= 1) {
+				throw new Error(Mplayer.message.isSingleMode);
+			}
 			if (this.currentTrack === 0) {
 				if (this.loop === "false") {
 					return false;
@@ -114,6 +128,9 @@
 		},
 
 		shuffle: function () {
+			if (this.playlist.length <= 1) {
+				throw new Error(Mplayer.message.isSingleMode);
+			}
 			var self = this;
 			self.originalList = [];
 			self.playlist.forEach(function (item, index) {
@@ -178,6 +195,10 @@
 			var MGUI = {},
 				self = this,
 				length = this.playlist.length;
+
+			if (self.element.find(self.css.player).length > 0) {
+				throw new Error(Mplayer.message.isInitialized);
+			}
 
 			MGUI.mplayer = $("<div class='mplayer-" + self.index + " "+self.css.player.substring(1)+"'></div>");
 			MGUI.main = $("<div class='"+self.css.main.substring(1)+"'></div>");
@@ -244,6 +265,9 @@
 		updatePlaylist: function () {
 			var self = this;
 
+			if (self.playlist.length <= 1) {
+				throw new Error(Mpalyer.message.isSingleMode);
+			}
 			self.element.find(self.css.playlist+" ul").remove().end()
 				.find(self.css.playlist).append($("<ul>"));
 			self.playlist.forEach(function (item, index, arr) {
