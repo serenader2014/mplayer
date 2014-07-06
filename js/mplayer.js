@@ -1,6 +1,6 @@
 ;(function ($, window, undefined) {
 	var Mplayer = function (e) {
-		this.Version = "0.1.0";
+		this.Version = "0.2.0"; //修复手机浏览器的播放列表功能
 		this.element = e;
 		this.playlist = [];
 		this.currentTrack = 0;
@@ -75,7 +75,7 @@
 			self.load(0);
 
 			//以下两个方法都需要先正确获取 this.audio 元素之后才能正常工作。
-			self.defaultEventBinding().eventListener();
+			self.defaultEventBinding().audioEventListener();
 			self.audio[0].volume = 0.8;
 			return this;
 		},
@@ -160,16 +160,27 @@
 		},
 
 		load: function (i) {
-			var self = this;
-			self.element
-				.find(self.css.current).removeClass(self.css.current.substring(1)).end()
+			var self = this,
+				audio,
+				e = self.element;
+			e.find(self.css.current).removeClass(self.css.current.substring(1)).end()
 				.find(self.css.song).eq(i).addClass(self.css.current.substring(1));
+
+			//修复手机浏览器不能播放列表的问题。
+			//之前实现列表播放的方法是改变audio元素的src属性，然后将其强制加载音频文件。这种方法在电脑浏览器中可以正常运行。但是无法在手机浏览器运行。
+			//修复的方法是，将原来的audio元素从文档流中移除，但是不是完全删除该元素（使用jQuery的.detach()方法）。然后再将移除出来的audio重新append进
+			//文档中。从而浏览器会重新获得该元素，然后开始下载音频文件。这样就不会出现之前的在手机端中无法下载媒体文件的问题。
+			audio = e.find(self.css.audio).detach();
+			e.append(audio);
+
 			self.audio.find("source")
 				.eq(0).attr("src", this.playlist[i].mp3).end()
 				.eq(1).attr("src", this.playlist[i].ogg);
-			self.element.find(self.css.cover).attr("src", self.playlist[i].cover);
-			self.element.find(self.css.artist).html(self.playlist[i].artist).end()
-				.find(self.css.title).html(self.playlist[i].title);
+			e.find(self.css.cover).attr("src", self.playlist[i].cover).end()
+				.find(self.css.artist).html(self.playlist[i].artist).end()
+				.find(self.css.title).html(self.playlist[i].title).end()
+				.find(self.css.duration).html(self.audio[0].duration);
+			self.audio[0].load();
 			
 			return this;
 		},
@@ -181,11 +192,9 @@
 			} else {
 				self.load(i);
 				self.currentTrack = i;
-				self.audio[0].load();
 				self.audio.on("canplay", function () {
 					self.play();
 				});
-				self.element.find(self.css.duration).html(self.audio[0].duration);
 			}
 			return this;
 		},
@@ -428,6 +437,14 @@
 
 			var update;
 
+
+			return this;
+		},
+
+		audioEventListener: function () {
+			var self = this，
+				e = self.element;
+
 			self.audio.on("play", function () {
 				var currentTime,
 					duration = self.audio[0].duration;
@@ -443,11 +460,6 @@
 				clearInterval(update);
 			});
 
-			return this;
-		},
-
-		eventListener: function () {
-			var self = this;
 			self.audio.on("ended", function () {
 				if (self.loop === "single") {
 					self.play();
@@ -458,13 +470,13 @@
 
 			self.audio.on("playerOnChanged", function () {
 				if (self.isPlaying) {
-					self.element.find(self.css.play)
+					e.find(self.css.play)
 						.removeClass(self.css.play.substring(1))
 						.removeClass("icon-play")
 						.addClass(self.css.pause.substring(1))
 						.addClass("icon-pause");
 				} else {
-					self.element.find(self.css.pause)
+					e.find(self.css.pause)
 						.removeClass(self.css.pause.substring(1))
 						.removeClass("icon-pause")
 						.addClass(self.css.play.substring(1))
