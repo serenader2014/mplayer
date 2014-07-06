@@ -442,7 +442,7 @@
 		},
 
 		audioEventListener: function () {
-			var self = this，
+			var self = this,
 				e = self.element;
 
 			self.audio.on("play", function () {

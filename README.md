@@ -6,6 +6,20 @@ The Mplayer has lots of Opening APIs, it lets developer more easier to play audi
 
 Created by serenader in 2014/6 updated in 2014/7.
 
+
+----
+##ScreenShot
+![screenshot1](screenshot/ss1.png)
+
+Player that with no playlist displayed.
+
+![screenshot2](screenshot/ss2.png)
+
+Player that with playlist.
+
+
+
+
 ----
 ##Basic usage
 
