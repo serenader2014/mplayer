@@ -17,6 +17,10 @@ Player that with no playlist displayed.
 
 Player that with playlist.
 
+![screenshot3](screenshot/ss3.png)
+
+Add another audio.
+
 
 
 
@@ -131,10 +135,17 @@ These methods below can be called in the Mplayer instance. But not all methods w
 
 * `getDuration()` : Return the current audio's duration. Also this one will not support chaining expression.
 
-* `defaultEventBinding` : When calling `initialize()` method ,this method will be excuted, just like `createView()` method. After initialize the instance, you won't need to call this method again. Because binding event listener multiple time can reduce the web page's performance.
+* `defaultEventBinding` : When calling `initialize()` method ,this method will be excuted, just like `createView()` method. After initialize the instance, you won't need to call this method again. Because binding event listener multiple time can reduce the web page's performance. 
 
 * <del>`eventListener` : This one is similar to `defaultEventBinding`. It will be merged into `defaultEventBinding` method in the future.</del>**Changed in the version 0.2.0.**
+
 * `audioEventListener` : This method is used to adding some listener to the audio element. *Added in the version 0.2.0*
+
+* `delete(i)` : This method is used to delete some audios that user dosen't want to play. It accepts one argument, that is the audio's index that you want to delete.
+
+* `add(item)` : Using this method, you can add more audios to the playlist that you want. It accepts one argument. And the argument can be a *string* or *object*. The `Mplayer` will translate it to the correct format.
+
+* `updateSingleMode()` : This method is built for `Mplayer.fn.delete()` method. When the playlist' length is 2, deleting 1 audio will trigger this method. It will change the current UI to single audio mode. If the playlist's length is not equal to 1, calling this method will do nothing.
 
 
 ----
@@ -148,39 +159,49 @@ Each instance will store some important properties. The whole instance use these
 
 ```
 css: {
-        player: ".mplayer",
-        main: ".mplayer-main",
-        playlist: ".mplayer-playlist",
-        audio: ".mplayer-audio",
-        control: ".mplayer-control",
-        play: ".mplayer-btn-play",
-        pause: ".mplayer-btn-pause",
-        next: ".mplayer-btn-next",
-        prev: ".mplayer-btn-prev",
-        loop: ".mplayer-btn-noloop",
-        singleLoop: ".mplayer-btn-single",
-        allLoop: ".mplayer-btn-all",
-        shuffle: ".mplayer-btn-shuffle",
-        song: ".mplayer-song",
-        current: ".mplayer-current",
-        cover: ".mplayer-cover",
-        title: ".mplayer-title",
-        artist: ".mplayer-artist",
-        progressBar: ".mplayer-progress",
-        playedTime: ".mplayer-played-time",
-        volumeBar: ".mplayer-volume",
-        volumeValue: ".mplayer-volume-value",
-        currentTime: ".mplayer-current-time",
-        duration: ".mplayer-duration",
-        time: ".mplayer-time",
-        mute: ".mplayer-mute",
-        maxVolume: ".mplayer-max-volum",
-        playlistMenu: ".mplayer-list"
+    player: ".mplayer",
+    main: ".mplayer-main",
+    playlist: ".mplayer-playlist",
+    audio: ".mplayer-audio",
+    control: ".mplayer-control",
+    play: ".mplayer-btn-play",
+    pause: ".mplayer-btn-pause",
+    next: ".mplayer-btn-next",
+    prev: ".mplayer-btn-prev",
+    loop: ".mplayer-btn-noloop",
+    singleLoop: ".mplayer-btn-single",
+    allLoop: ".mplayer-btn-all",
+    shuffle: ".mplayer-btn-shuffle",
+    song: ".mplayer-song",
+    current: ".mplayer-current",
+    cover: ".mplayer-cover",
+    title: ".mplayer-title",
+    artist: ".mplayer-artist",
+    progressBar: ".mplayer-progress",
+    playedTime: ".mplayer-played-time",
+    volumeBar: ".mplayer-volume",
+    volumeValue: ".mplayer-volume-value",
+    currentTime: ".mplayer-current-time",
+    duration: ".mplayer-duration",
+    time: ".mplayer-time",
+    mute: ".mplayer-mute",
+    maxVolume: ".mplayer-max-volum",
+    playlistMenu: ".mplayer-list",
+    deleteBtn: ".mplayer-delete-btn",
+    addBtn: ".mplayer-add-btn",
+    addAudio: ".mplayer-add",
+    addArtist: ".mplayer-add-artist",
+    addTitle: ".mplayer-add-title",
+    addCover: ".mplayer-add-cover",
+    addMp3: ".mplayer-add-mp3",
+    addOgg: ".mplayer-add-ogg",
+    addSubmit: ".mplayer-add-submit",
+    addCancel: ".mplayer-add-cancel"
 }
 
 ```
 
-Above is the default HTML structure.
+Above is the default HTML structure.**Changed in the Version 0.2.1**
 To use the custom HTML structure is to pass the object like above into the `initialize()` method. For more details please refer to the intro.
 
 * `element`: This property stores the current instance's jQuery object. For example, if you create a Mplayer instance using `$(".test").Mplayer()` , the `instance.element` is set to `$(".test")`. And you can use this property to do a lot things.
@@ -196,6 +217,18 @@ To use the custom HTML structure is to pass the object like above into the `init
 <del>1. Mobile phone broswer doesn't work well. Multi audio won't work in my android phone. Haven't test in the iPhone. This will take some times to work out.</del> **Fixed in the version 0.2.0.**
 
 2. You tell me.
+
+-----
+###Changelog
+
+####v0.1.0
+Initial version. Core function works, but mobile phone broswer can't work properly.
+
+####v0.2.0
+Fixed the bug that can't play playlist in the moblie phone broswer.
+
+####v0.2.1
+Add some useful method such as `Mplayer.fn.add()` and so on. 
 
 -----
 ###TODO

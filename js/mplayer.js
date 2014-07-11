@@ -1,6 +1,6 @@
 ;(function ($, window, undefined) {
     var Mplayer = function (e) {
-        this.Version = "0.2.0"; //修复手机浏览器的播放列表功能
+        this.Version = "0.2.1"; //修复手机浏览器的播放列表功能,添加一些功能
         this.element = e;
         this.playlist = [];
         this.currentTrack = 0;
@@ -13,8 +13,38 @@
     Mplayer.message = {
         isInitialized: "This instance is aleady initialized",
         isSingleMode: "This instance is in single mode, doesn't support this function.",
+        isSingleAudio: "This instance only has one audio, can not delete the only one audio.",
+        itemInvalid: "The item you added is not valid.",
 
     };
+
+    Mplayer.parseAudio = function (item) {
+        if (typeof item === "object") {
+            item.artist = item.artist|| "undefined";
+            item.title = item.title || "undefined";
+            item.cover = item.cover || "undefined";
+            item.mp3 = item.mp3 || "undefined";
+            item.ogg = item.ogg || "undefined";
+
+            return item;
+        } else if (typeof item === "string") {
+            var tmp = {},
+                fileName = item.substring(item.lastIndexOf("/")+1),
+                middleScore = fileName.indexOf("-");
+            if (middleScore !== -1) {
+                tmp.artist = $.trim(fileName.substring(0, middleScore-1));
+                tmp.title = $.trim(fileName.substring(middleScore+1,fileName.lastIndexOf(".")));
+            } else {
+                tmp.artist = "undefined";
+                tmp.title = $.trim(item.substring(item.lastIndexOf(".")));
+            }
+            tmp.cover = item.substring(0,item.lastIndexOf(".")) + ".jpg";
+            tmp.mp3 = item.substring(0,item.lastIndexOf(".")) + ".mp3";
+            tmp.ogg = item.substring(0,item.lastIndexOf(".")) + ".ogg";
+
+            return tmp;
+        }
+    }
 
     Mplayer.prototype = {
         initialize: function (list, css) {
@@ -26,31 +56,7 @@
             }
             if ($.isArray(list)) {
                 list.forEach(function (item, index) {
-                    if (typeof item === "object") {
-                        item.artist = item.artist ? item.artist: "undefined";
-                        item.title = item.title ? item.title : "undefined";
-                        item.cover = item.cover ? item.cover : "undefined";
-                        item.mp3 = item.mp3 ? item.mp3 : "undefined";
-                        item.ogg = item.ogg ? item.ogg : "undefined";
-                        
-                        self.playlist.push(item);
-                    } else if (typeof item === "string") {
-                        var tmp = {},
-                            fileName = item.substring(item.lastIndexOf("/")+1),
-                            middleScore = fileName.indexOf("-");
-                        if (middleScore !== -1) {
-                            tmp.artist = $.trim(fileName.substring(0, middleScore-1));
-                            tmp.title = $.trim(fileName.substring(middleScore+1,fileName.lastIndexOf(".")));
-                        } else {
-                            tmp.artist = "undefined";
-                            tmp.title = $.trim(item.substring(item.lastIndexOf(".")));
-                        }
-                        tmp.cover = item.substring(0,item.lastIndexOf(".")) + ".jpg";
-                        tmp.mp3 = item.substring(0,item.lastIndexOf(".")) + ".mp3";
-                        tmp.ogg = item.substring(0,item.lastIndexOf(".")) + ".ogg";
-
-                        self.playlist.push(tmp);
-                    }
+                    self.playlist.push(Mplayer.parseAudio(item));
                 });
             } else {
                 throw new Error("Invalid playlist.");
@@ -100,8 +106,8 @@
             }
             if (this.currentTrack === this.playlist.length - 1) {
                 if (this.loop === "false") {
+                    this.audio[0].currentTime = 0;
                     this.pause();
-                    //this.audio[0].currentTime = 0;
                 } else if (this.loop === "all") {
                     this.switchTrack(0);
                 }
@@ -275,16 +281,19 @@
             var self = this;
 
             if (self.playlist.length <= 1) {
-                throw new Error(Mpalyer.message.isSingleMode);
+                throw new Error(Mplayer.message.isSingleMode);
             }
-            self.element.find(self.css.playlist+" ul").remove().end()
+            self.element.find(self.css.playlist+" ul,"+self.css.addAudio).remove().end()
                 .find(self.css.playlist).append($("<ul>"));
             self.playlist.forEach(function (item, index, arr) {
                 self.element.find(self.css.playlist+" ul")
                     .append($("<li></li>")
-                        .append($("<a href='javascript:;'>" + (index*1+1) +". "+ item.artist + " - " + item.title+ "</a>")
-                            .addClass(self.css.song.substring(1))));
+                        .append($("<a href='javascript:;' class='"+self.css.song.substring(1)+"'>" + (index*1+1) +". "+ item.artist + " - " + item.title+ "</a>"))
+                        .append($("<a href='javascript:;' class='icon-circle-cross  "+self.css.deleteBtn.substring(1)+"'></a>")));
             });
+
+            self.element.find(self.css.playlist+ " ul").append(
+                $("<li><a href='javascript:;' class='"+self.css.addBtn.substring(1)+"'>添加...</a></li>"))
 
             return this;
         },
@@ -317,7 +326,61 @@
             time: ".mplayer-time",
             mute: ".mplayer-mute",
             maxVolume: ".mplayer-max-volum",
-            playlistMenu: ".mplayer-list"
+            playlistMenu: ".mplayer-list",
+            deleteBtn: ".mplayer-delete-btn",
+            addBtn: ".mplayer-add-btn",
+            addAudio: ".mplayer-add",
+            addArtist: ".mplayer-add-artist",
+            addTitle: ".mplayer-add-title",
+            addCover: ".mplayer-add-cover",
+            addMp3: ".mplayer-add-mp3",
+            addOgg: ".mplayer-add-ogg",
+            addSubmit: ".mplayer-add-submit",
+            addCancel: ".mplayer-add-cancel"
+        },
+
+        delete: function (i) {
+            var self = this;
+            if (self.playlist.length === 1) {
+                throw new Error(Mplayer.message.isSingleAudio);
+            }
+            self.playlist.splice(i, 1);
+            if (self.playlist.length === 1) {
+                self.updateSingleMode();
+            } else {
+                self.updatePlaylist();
+            }
+            if (self.currentTrack === i) {
+                if (i === self.playlist.length-1) {
+                    self.switchTrack(0);
+                } else {
+                    self.switchTrack(i);
+                }
+            }
+
+            return this;
+        },
+
+        add: function (item) {
+            var self = this;
+
+            self.playlist.push(Mplayer.parseAudio(item));
+            self.updatePlaylist();
+
+            return this;
+        },
+
+        updateSingleMode: function () {
+            var self = this;
+            if (self.playlist.length === 1) {
+                self.element.find(self.css.playlist).remove().end()
+                    .find(self.css.playlistMenu).remove().end()
+                    .find(self.css.next).remove().end()
+                    .find(self.css.prev).remove().end()
+                    .find(self.css.shuffle).remove();
+            }
+
+            return this;
         },
 
         setProgress: function (i) {
@@ -397,6 +460,57 @@
                 self.shuffle();
             });
 
+            e.find(self.css.playlist).on("click", self.css.deleteBtn, function () {
+                self.delete($(self.css.deleteBtn).index($(this)));
+            }).on("click", self.css.addBtn, function () {
+                if ($(this).html() === "添加...") {
+                    var container = $("<div class='"+self.css.addAudio.substring(1)+"'></div>"),
+                        artist = $("<input class='"+self.css.addArtist.substring(1)+"' placeholder='歌手名字'>"),
+                        title = $("<input class='"+self.css.addTitle.substring(1)+"' placeholder='歌曲名字'>"),
+                        cover = $("<input class='"+self.css.addCover.substring(1)+"' placeholder='专辑封面地址'>"),
+                        mp3 = $("<input class='"+self.css.addMp3.substring(1)+"' placeholder='Mp3文件地址'>"),
+                        ogg = $("<input class='"+self.css.addOgg.substring(1)+"' placeholder='Ogg文件地址'>"),
+                        submit = $("<button class='"+self.css.addSubmit.substring(1)+"'>添加</button>"),
+                        cancel = $("<button class='"+self.css.addCancel.substring(1)+"'>取消</button>");
+                    container.append(artist).append(title).append(cover).append(mp3).append(ogg).append(submit).append(cancel);
+                    e.find(self.css.playlist).append(container);
+                    $(this).html("取消");
+                } else {
+                    e.find(self.css.addAudio).remove();
+                    $(this).html("添加...");
+                }
+            }).on("click", self.css.addSubmit ,function () {
+                var artist = e.find(self.css.addArtist).val(),
+                    title = e.find(self.css.addTitle).val(),
+                    cover = e.find(self.css.addCover).val(),
+                    mp3 = e.find(self.css.addMp3).val(),
+                    ogg = e.find(self.css.addOgg).val(),
+                    tmp = mp3 || ogg;
+
+                if (tmp) {
+                    if (artist || title || cover) {
+                        self.add({
+                            artist: artist,
+                            title: title,
+                            cover: cover,
+                            mp3: mp3,
+                            ogg: ogg
+                        });
+                    } else {
+                        self.add(tmp);
+                    }
+
+                } else {
+                    alert(Mplayer.message.itemInvalid);
+                    return false;
+                }
+            }).on("click", self.css.addCancel, function () {
+                e.find(self.css.addAudio).remove();
+                e.find(self.css.addBtn).html("添加...");
+            }).on("click", self.css.song, function () {
+                self.switchTrack(e.find(self.css.song).index($(this)));
+            });
+
             e.find(self.css.progressBar).on("click", function (event) {
                 if (self.isPlaying) {
                     var pos = event.pageX - getPos(this).left,
@@ -429,15 +543,6 @@
                 $(this).toggleClass("mplayer-btn-active");
             });
 
-            e.find(self.css.song).each(function (index, item, arr) {
-                $(item).on("click", function () {
-                    self.switchTrack(index);
-                });
-            });
-
-            var update;
-
-
             return this;
         },
 
@@ -464,7 +569,11 @@
                 if (self.loop === "single") {
                     self.play();
                 } else {
-                    self.next();
+                    if (self.playlist.length === 1) {
+                        self.pause();
+                    } else {
+                        self.next();
+                    }
                 }
             });
 

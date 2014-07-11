@@ -46,6 +46,7 @@
     }
 
     li {
+        position: relative;
         list-style: none;
         border-top: 1px solid #CCCCCC;
         &:nth-child(odd) {
@@ -54,6 +55,23 @@
         &:last-child {
             border-bottom: 1px solid #CCCCCC;
         }
+        &:hover .mplayer-delete-btn {
+            display: inline;
+        }
+
+
+        .mplayer-delete-btn {
+            display: none;
+            position: absolute;
+            top: 0;
+            right: 1rem;
+            color: #FF263C;
+        }
+
+        .mplayer-add-btn {
+            padding-left: 1rem;
+        }
+
     }
 
     a {
@@ -66,6 +84,44 @@
             color: #111111;
         }
     }
+}
+
+.mplayer-add {
+    width: 100%;
+    input {
+        width: 100%;
+        padding: 0.5rem 1rem;
+        margin-top: 0.5rem;
+        box-sizing: border-box;
+        outline: none;
+        border: 1px solid #2184DF;
+        font-size: 0.85rem;
+
+        &:focus {
+            border-color: #888888;
+        }
+    }
+}
+
+.mplayer-add-submit, .mplayer-add-cancel {
+    display: inline-block;
+    width: 45%;
+    padding: 0.8rem 1rem;
+    margin-top: 1rem;
+    border: 1px solid #207ED4;
+    color: #FFFFFF;
+    font-size: 1rem;
+    background: #4497E3;
+    outline: none;
+    cursor: pointer;
+}
+
+.mplayer-add-submit {
+    margin-right: 5%;
+}
+
+.mplayer-add-cancel {
+    margin-left: 5%;
 }
 
 .mplayer-list {
