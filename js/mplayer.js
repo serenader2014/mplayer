@@ -597,7 +597,9 @@
 
     };
 
-    $.fn.Mplayer = function () {
-        return new Mplayer(this);
+    $.fn.Mplayer = function (list,css) {
+        var instance = new Mplayer(this);
+        instance.initialize(list,css);
+        return instance;
     };
 })(jQuery, window);
