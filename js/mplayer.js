@@ -1,6 +1,6 @@
 ;(function ($, window, undefined) {
     var Mplayer = function (e) {
-        this.Version = "0.2.1"; //修复手机浏览器的播放列表功能,添加一些功能
+        this.Version = "0.2.2"; //修复手机浏览器的播放列表功能,添加一些功能。改用一种新的方式创建实例。
         this.element = e;
         this.playlist = [];
         this.currentTrack = 0;

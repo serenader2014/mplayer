@@ -11,7 +11,7 @@ var p1 = $(".test1").Mplayer([
         cover: "audios/猛虎巧克力 - 别让我孤单.jpg"
     }
     ]);
-var p2 = $(".test2").Mplaye([
+var p2 = $(".test2").Mplayer([
     "audios/Shontelle - Impossible.mp3",
     "audios/Tynisha Keli - You & Me Against The World (Non-Album Track).ogg"
     ]);

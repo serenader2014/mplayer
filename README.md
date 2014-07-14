@@ -42,7 +42,7 @@ The simplest example is like this:
 <body>
     <div class="player"></div>
     <script>
-        var player = $(".player").Mplayer().initialize([
+        var player = $(".player").Mplayer([
             "http://example.com/some/mp3/file.mp3",
             "http://example.com/some/mp3/file2.mp3",
             "http://example.com/some/mp3/file3.mp3",
@@ -65,7 +65,7 @@ The code above will create a Mplayer instance.
 
 The way to create a Mplayer instance is calling the `Mplayer()` method behind a jQuery object, like this `$("element").Mplayer()` . This code shows how to create an instance. It is easy, doesn't it?
 
-And after created an instance, you must pass a playlist to the `initialize()` method. The `Mplayer` object support chaining method. So after you called the `Mplayer()` method, you can continue call another Mplayer method.
+And after created an instance, you must pass a playlist to the `Mplayer()` method. The `Mplayer` object support chaining method. So after you called the `Mplayer()` method, you can continue call another Mplayer method.
 
 So we create a player, and what we have to do is giving a playlist. Even a single audio.
 
@@ -106,7 +106,7 @@ The details to create a player is to create a Mplayer instance, and every instan
 ####Method introduction
 These methods below can be called in the Mplayer instance. But not all methods will work in all the time. Some methods require some conditions.
 
-* `initilaize(list, css)` : This method only can be called when you are just creating an instance. If you have already called this method to the instance, call it again will throw an error.This method is used to initialize the player, including creating the player's UI and binding the element's event, and all the logic. It accepts two arguments, the first one is the playlist. It must be an array. The playlist's format can be found in above. The second argument is the custom HTML structure. Passing the second argument means that you have already create a set of document element, so the Mplayer plugin won't create the document element again. This is optional. Default is none. The second argument is an object, its format can be found in the *Important property introduction* part. Read it carefully before you passing the second argument. Because it is easy to get wrong, and makes the player don't work.
+* `initilaize(list, css)` : This method will be called when you are just creating an instance. After creating an instance, calling this method again will throw an error.This method is used to initialize the player, including creating the player's UI and binding the element's event, and all the logic. It accepts two arguments, the first one is the playlist. It must be an array. The playlist's format can be found in above. The second argument is the custom HTML structure. Passing the second argument means that you have already create a set of document element, so the Mplayer plugin won't create the document element again. This is optional. Default is none. The second argument is an object, its format can be found in the *Important property introduction* part. Read it carefully before you passing the second argument. Because it is easy to get wrong, and makes the player don't work. *In the version **0.2.2**, creating an instance is to call the `Mplayer()` method after a jQuery object. And you don't need to call the `initialize` method any more. The `Mplayer()` method will call it automatically. **So the arguments you must pass to the `initialize()` method will now pass to `Mplayer()` method.***
 
 * `play()` : Calling this method will immediately play the current audio.
 
