@@ -1,6 +1,6 @@
 # Mplayer
 
-This is a jQuery plugin that support audio playing in the modern broswer. With this framework you can easily create multi-player in your website page, and support single or multi-audio.
+This is a jQuery plugin that support audio playing in the modern broswer. With this plugin you can easily create multi-players in your website page, and support single or multi-audios.
 
 The Mplayer has lots of Opening APIs, it lets developer more easier to play audios in the broswer and have full control of it.
 
@@ -26,11 +26,12 @@ Add another audio.
 
 --------
 
+
 ## Basic usage
 
 The simplest example is like this:
 
-```
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -61,24 +62,27 @@ The simplest example is like this:
 ```
 The code above will create a Mplayer instance.
 
+
 --------
+
 
 ## Advance config
 
-The way to create a Mplayer instance is calling the `Mplayer()` method behind a jQuery object, like this `$("element").Mplayer()` . This code shows how to create an instance. It is easy, doesn't it?
+The way to create a Mplayer instance is calling the `Mplayer()` method behind a jQuery object, like this `$("element").Mplayer()` . This code shows how to create an instance. 
 
-And after created an instance, you must pass a playlist to the `Mplayer()` method. The `Mplayer` object support chaining method. So after you called the `Mplayer()` method, you can continue call another Mplayer method.
+And after created an instance, you must pass a playlist to the `Mplayer()` method. The `Mplayer` object supports chaining method. So after you called the `Mplayer()` method, you can continue call another Mplayer method.
 
-So we create a player, and what we have to do is giving a playlist. Even a single audio.
+After creating a player, what we have to do next is giving a playlist. Even a single audio.
 
 Storing the audio list in an Array. Such as `["this is an example.mp3","another example.mp3"]`.
 
 You might notice that the example code above using an Object to create a single audio, yes, the playlist support two kinds of format. 
-You can pass a string that contains an audio source, like this `"artist - title.mp3"` . The Mplayer will detect the string wheather contains the `-` charactor or not. If not ,it will set this audio's artist to "undefined", and set the title to the string. If contains the `-` charactor, it will split it into two strings and set to the audio's artist and title. 
-The another way to pass the audio is using an object. The object must contains the `mp3` or the `ogg` keys. The player will set these keys' value to the player's `src` attribute. So when you use a custom format, please notice this. And you may define the audio's artist and title to what you want.
+You can pass a string that contains an audio source, like `"artist - title.mp3"` . The Mplayer will detect the string wheather contains the `-` charactor or not. If not ,it will set this audio's artist to "undefined", and set the title to the string. If contains the `-` charactor, it will split it into two strings and set to the audio's artist and title.
+
+The another way to pass the audio is using an object. The object must contains the `mp3` or the `ogg` key. The player will set these keys' value to the player's `src` attribute. So when you use a custom format, please notice this. And you may define the audio's artist and title to what ever you want.
 Here is the important keys that will use in the player:
 
-```
+```javascript
 {
     artist: "artist",
     title: "title",
@@ -93,8 +97,8 @@ This way of creating audio lets you have full control of your playlist's informa
 
 ### How it works
 
-HTML5 started to support native Audio/Video , it's not strange. But the HTML5 Audio tag only support one audio in one tag.
-So I wonder if there is some way to create a web player that support playlist, using `<audio></audio>` tag.
+HTML5 started to support native Audio/Video , it's not strange to us. But the HTML5 Audio tag only support one audio in one tag.
+So I wonder if there is any way to create a web player that support playlist, using `<audio></audio>` tag.
 
 I began to search the Internet. And I found [jPlayer](https://github.com/happyworm/jPlayer). I have to admit that jPlayer works like a charm! I love it!. And I began to use it. But after a while I started to wonder, can I create a light player that simply support HTML audio ?
 So I begin to write a plugin by myself.
@@ -105,9 +109,10 @@ The way how Mplayer works is dynamic changing the `<audio></audio>`'s `src` attr
 The details to create a player is to create a Mplayer instance, and every instance will have its own playlist, index, and other methods and property. So we can easily control every instance and will not obstruct other instances.
 
 
------ 
 
-#### Method introduction
+-----
+#### Method
+
 These methods below can be called in the Mplayer instance. But not all methods will work in all the time. Some methods require some conditions.
 
 * `initilaize(list, css)` : This method will be called when you are just creating an instance. After creating an instance, calling this method again will throw an error.This method is used to initialize the player, including creating the player's UI and binding the element's event, and all the logic. It accepts two arguments, the first one is the playlist. It must be an array. The playlist's format can be found in above. The second argument is the custom HTML structure. Passing the second argument means that you have already create a set of document element, so the Mplayer plugin won't create the document element again. This is optional. Default is none. The second argument is an object, its format can be found in the *Important property introduction* part. Read it carefully before you passing the second argument. Because it is easy to get wrong, and makes the player don't work. *In the version __0.2.2__, creating an instance is to call the `Mplayer()` method after a jQuery object. And you don't need to call the `initialize` method any more. The `Mplayer()` method will call it automatically. __So the arguments you must pass to the `initialize()` method will now pass to `Mplayer()` method.__*
@@ -154,7 +159,7 @@ These methods below can be called in the Mplayer instance. But not all methods w
 
 ----
 
-#### Important property introduction
+#### Properties
 
 Each instance will store some important properties. The whole instance use these properties to work correctly.
 
@@ -162,7 +167,7 @@ Each instance will store some important properties. The whole instance use these
 
 * `css` : This one stores the instance's HTML structure. With this property, we are able to use our custom HTML structure, instead of using the default ones. And therefore we can custom the instance's interface, not only CSS, but also HTML. The instance's event binding uses this property's value, so the custom HTML structure we given will also work. This property is an object. All the keys that the player need are :
 
-```
+```javascript
 css: {
     player: ".mplayer",
     main: ".mplayer-main",
@@ -229,7 +234,8 @@ To use the custom HTML structure is to pass the object like above into the `init
 #### v0.1.0
 Initial version. Core function works, but mobile phone broswer can't work properly.
 
-####v 0.2.0
+
+#### v0.2.0
 Fixed the bug that can't play playlist in the moblie phone broswer.
 
 #### v0.2.1

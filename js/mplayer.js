@@ -7,6 +7,7 @@
         this.index = Mplayer.count++;
         this.loop = "false";
         this.isPlaying = false;
+        this.css = {};
     };
 
     Mplayer.count = 0;
@@ -44,14 +45,301 @@
 
             return tmp;
         }
-    }
+    };
+
+    Mplayer.createView = function (instance) {
+        //缺省模式下自动生成GUI。也可以自写GUI。
+        var MGUI = {},
+            self = instance,
+            length = self.playlist.length;
+
+        if (self.element.find(self.css.player).length > 0) {
+            throw new Error(Mplayer.message.isInitialized);
+        }
+
+        MGUI.mplayer = $("<div class='mplayer-" + self.index + " "+self.css.player.substring(1)+"'></div>");
+        MGUI.main = $("<div class='"+self.css.main.substring(1)+"'></div>");
+        MGUI.audio = $("<audio class='"+self.css.audio.substring(1)+"'></audio>");
+        MGUI.source = $("<source></source><source></source>");
+        MGUI.control = $("<div class='"+self.css.control.substring(1)+"'></div>");
+        MGUI.artist = $("<p class='icon-artist "+self.css.artist.substring(1)+"'></p>");
+        MGUI.title = $("<p class='icon-track "+self.css.title.substring(1)+"'></p>");
+        MGUI.progress = $("<span class='"+self.css.progressBar.substring(1)+"'></span>")
+            .append($("<span class='"+self.css.playedTime.substring(1)+"'></span>"));
+        MGUI.volume = $("<span class='"+self.css.volumeBar.substring(1)+"'></span>")
+            .append($("<span class='"+self.css.volumeValue.substring(1)+"'></span>"));
+        MGUI.mute = $("<span></span>")
+            .append("<a class='icon-mute "+self.css.mute.substring(1)+"' href='javascript:;'></a>");
+        MGUI.maxVolume = $("<span></span>")
+            .append($("<a class='icon-volume "+self.css.maxVolume.substring(1)+"' href='javascript:;'></a>"));
+        MGUI.time = $("<span class='icon-clock "+self.css.time.substring(1)+"'></span>")
+            .append($("<span class='"+self.css.currentTime.substring(1)+"'>-:--</span>"))
+            .append($("<span>/</span>"))
+            .append($("<span class='"+self.css.duration.substring(1)+"'>-:--</span>"));
+        MGUI.play = $("<span></span>")
+            .append($("<a class='icon-play "+self.css.play.substring(1)+"' href='javascript:;'></a>"));
+        MGUI.loop = $("<span></span>")
+            .append($("<a class='icon-repeat "+self.css.loop.substring(1)+"' href='javascript:;'></a>"));
+        MGUI.cover = $("<img class='"+self.css.cover.substring(1)+"' src=''>");
+
+        //当播放列表只有一首时，不生成以下元素。
+        if (length > 1) {
+            MGUI.playlist = $("<div class='"+self.css.playlist.substring(1)+"'></div>");
+
+            MGUI.playlistMenu = $("<span></span>")
+                .append($("<a class='icon-list "+self.css.playlistMenu.substring(1)+"' href='javascript:;'></a>"));
+
+            MGUI.shuffle = $("<span></span>")
+                .append($("<a class='icon-shuffle "+self.css.shuffle.substring(1)+"' href='javascript:;'></a>"));
+
+            MGUI.next = $("<span></span>")
+                .append($("<a class='icon-next "+self.css.next.substring(1)+"' href='javascript:;'></a>"));
+
+            MGUI.prev = $("<span></span>").
+                append($("<a class='icon-prev "+self.css.prev.substring(1)+"' href='javascript:;'></a>"));
+        } else {
+            MGUI.playlist = MGUI.playlistMenu = MGUI.shuffle = MGUI.next = MGUI.prev = "";
+        }
+
+
+        MGUI.audio.append(MGUI.source);
+        MGUI.control
+            .append(MGUI.artist)
+            .append(MGUI.title)
+            .append(MGUI.playlistMenu)
+            .append(MGUI.time)
+            .append(MGUI.progress)
+            .append(MGUI.prev)
+            .append(MGUI.play)
+            .append(MGUI.next)
+            .append(MGUI.mute)
+            .append(MGUI.volume)
+            .append(MGUI.maxVolume)
+            .append(MGUI.shuffle)
+            .append(MGUI.loop);
+        MGUI.main.append(MGUI.audio).append(MGUI.cover).append(MGUI.control);
+        self.element.append(MGUI.mplayer.append(MGUI.main).append(MGUI.playlist));
+    };
+
+    Mplayer.css = {
+        player: ".mplayer",
+        main: ".mplayer-main",
+        playlist: ".mplayer-playlist",
+        audio: ".mplayer-audio",
+        control: ".mplayer-control",
+        play: ".mplayer-btn-play",
+        pause: ".mplayer-btn-pause",
+        next: ".mplayer-btn-next",
+        prev: ".mplayer-btn-prev",
+        loop: ".mplayer-btn-noloop",
+        singleLoop: ".mplayer-btn-single",
+        allLoop: ".mplayer-btn-all",
+        shuffle: ".mplayer-btn-shuffle",
+        song: ".mplayer-song",
+        current: ".mplayer-current",
+        cover: ".mplayer-cover",
+        title: ".mplayer-title",
+        artist: ".mplayer-artist",
+        progressBar: ".mplayer-progress",
+        playedTime: ".mplayer-played-time",
+        volumeBar: ".mplayer-volume",
+        volumeValue: ".mplayer-volume-value",
+        currentTime: ".mplayer-current-time",
+        duration: ".mplayer-duration",
+        time: ".mplayer-time",
+        mute: ".mplayer-mute",
+        maxVolume: ".mplayer-max-volum",
+        playlistMenu: ".mplayer-list",
+        deleteBtn: ".mplayer-delete-btn",
+        addBtn: ".mplayer-add-btn",
+        addAudio: ".mplayer-add",
+        addArtist: ".mplayer-add-artist",
+        addTitle: ".mplayer-add-title",
+        addCover: ".mplayer-add-cover",
+        addMp3: ".mplayer-add-mp3",
+        addOgg: ".mplayer-add-ogg",
+        addSubmit: ".mplayer-add-submit",
+        addCancel: ".mplayer-add-cancel"
+    };
+
+    Mplayer.defaultEventBinding = function (instance) {
+        var e = instance.element,
+            self = instance;
+
+        var getPos = function (element) {
+            var acturalLeft = element.offsetLeft;
+            var acturalTop = element.offsetTop;
+            var current = element.offsetParent;
+            while(current !== null){
+                acturalLeft = acturalLeft + current.offsetLeft;
+                acturalTop = acturalTop + current.offsetTop;
+                current = current.offsetParent;
+            }
+            return {
+                left: acturalLeft,
+                top: acturalTop
+            };
+        };
+
+        //使用事件委托，因为有些元素是经过脚本修改的，只有通过委托才能获取正确的元素。
+        e.find(self.css.control).on("click", self.css.play, function () {
+            self.switchTrack(self.currentTrack,true);
+        }).on("click", self.css.pause, function () {
+            self.pause();
+        }).on("click", self.css.next, function () {
+            self.next();
+        }).on("click", self.css.prev, function () {
+            self.prev();
+        }).on("click", self.css.loop, function () {
+            self.loop = "single";
+            $(this).removeClass(self.css.loop.substring(1)).addClass(self.css.singleLoop.substring(1));
+        }).on("click", self.css.singleLoop, function () {
+            self.loop = "all";
+            $(this).removeClass(self.css.singleLoop.substring(1)).addClass(self.css.allLoop.substring(1));
+        }).on("click", self.css.allLoop, function () {
+            self.loop = "false";
+            $(this).removeClass(self.css.allLoop.substring(1)).addClass(self.css.loop.substring(1));
+        }).on("click", self.css.shuffle, function () {
+            self.shuffle();
+        });
+
+        e.find(self.css.playlist).on("click", self.css.deleteBtn, function () {
+            self.delete($(self.css.deleteBtn).index($(this)));
+        }).on("click", self.css.addBtn, function () {
+            if ($(this).html() === "添加...") {
+                var container = $("<div class='"+self.css.addAudio.substring(1)+"'></div>"),
+                    artist = $("<input class='"+self.css.addArtist.substring(1)+"' placeholder='歌手名字'>"),
+                    title = $("<input class='"+self.css.addTitle.substring(1)+"' placeholder='歌曲名字'>"),
+                    cover = $("<input class='"+self.css.addCover.substring(1)+"' placeholder='专辑封面地址'>"),
+                    mp3 = $("<input class='"+self.css.addMp3.substring(1)+"' placeholder='Mp3文件地址'>"),
+                    ogg = $("<input class='"+self.css.addOgg.substring(1)+"' placeholder='Ogg文件地址'>"),
+                    submit = $("<button class='"+self.css.addSubmit.substring(1)+"'>添加</button>"),
+                    cancel = $("<button class='"+self.css.addCancel.substring(1)+"'>取消</button>");
+                container.append(artist).append(title).append(cover).append(mp3).append(ogg).append(submit).append(cancel);
+                e.find(self.css.playlist).append(container);
+                $(this).html("取消");
+            } else {
+                e.find(self.css.addAudio).remove();
+                $(this).html("添加...");
+            }
+        }).on("click", self.css.addSubmit ,function () {
+            var artist = e.find(self.css.addArtist).val(),
+                title = e.find(self.css.addTitle).val(),
+                cover = e.find(self.css.addCover).val(),
+                mp3 = e.find(self.css.addMp3).val(),
+                ogg = e.find(self.css.addOgg).val(),
+                tmp = mp3 || ogg;
+
+            if (tmp) {
+                if (artist || title || cover) {
+                    self.add({
+                        artist: artist,
+                        title: title,
+                        cover: cover,
+                        mp3: mp3,
+                        ogg: ogg
+                    });
+                } else {
+                    self.add(tmp);
+                }
+
+            } else {
+                alert(Mplayer.message.itemInvalid);
+                return false;
+            }
+        }).on("click", self.css.addCancel, function () {
+            e.find(self.css.addAudio).remove();
+            e.find(self.css.addBtn).html("添加...");
+        }).on("click", self.css.song, function () {
+            self.switchTrack(e.find(self.css.song).index($(this)));
+        });
+
+        e.find(self.css.progressBar).on("click", function (event) {
+            if (self.isPlaying) {
+                var pos = event.pageX - getPos(this).left,
+                    width = $(self.css.progressBar).width();
+                self.setProgress(self.audio[0].duration*(pos/width));
+            }
+        });
+
+        e.find(self.css.volumeBar).on("click", function (event) {
+            var pos = event.pageX - getPos(this).left,
+                width = $(self.css.volumeBar).width();
+            self.setVolume(pos/width);
+        });
+
+        e.find(self.css.mute).on("click", function () {
+            self.setVolume(0);
+        });
+
+        e.find(self.css.maxVolume).on("click", function () {
+            self.setVolume(1);
+        });
+
+        e.find(self.css.playlistMenu).on("click", function ()  {
+            var playlist = e.find(self.css.playlist);
+            if (playlist.is(":animated")) {
+                return false;
+            } else {
+                playlist.slideToggle(400);
+            }
+            $(this).toggleClass("mplayer-btn-active");
+        });
+    };
+
+    Mplayer.audioEventListener = function (instance) {
+        var self = instance,
+            e = self.element;
+
+        self.audio.on("play", function () {
+            var currentTime,
+                duration = self.audio[0].duration;
+            e.find(self.css.duration).html(self.getDuration());
+            update = setInterval(function () {
+                currentTime = self.audio[0].currentTime;
+                duration = self.audio[0].duration;
+                e.find(self.css.currentTime).html(self.getCurrentTime());
+                e.find(self.css.playedTime).css({"width":(currentTime/duration)*100+"%"});
+                e.find(self.css.volumeValue).css({"width":self.audio[0].volume*4+"rem"});
+            },500);
+        }).on("pause", function () {
+            clearInterval(update);
+        });
+
+        self.audio.on("ended", function () {
+            if (self.loop === "single") {
+                self.play();
+            } else {
+                if (self.playlist.length === 1) {
+                    self.pause();
+                } else {
+                    self.next();
+                }
+            }
+        });
+
+        self.audio.on("playerOnChanged", function () {
+            if (self.isPlaying) {
+                e.find(self.css.play)
+                    .removeClass(self.css.play.substring(1))
+                    .removeClass("icon-play")
+                    .addClass(self.css.pause.substring(1))
+                    .addClass("icon-pause");
+            } else {
+                e.find(self.css.pause)
+                    .removeClass(self.css.pause.substring(1))
+                    .removeClass("icon-pause")
+                    .addClass(self.css.play.substring(1))
+                    .addClass("icon-play");
+            }
+        });
+    };
 
     Mplayer.prototype = {
         initialize: function (list, css) {
             var self = this,
                 i;
-
-            if (self.element.find(self.css.player).length > 0) {
+            if (self.element.find(Mplayer.css.player).length > 0) {
                 throw new Error(Mplayer.message.isInitialized);
             }
             if ($.isArray(list)) {
@@ -63,12 +351,12 @@
             }
 
             if (css && typeof css === "object") {
-                for (i in css) {
-                    self.css[i] = css[i];
-                }
+                $.extend(self.css, Mplayer.css, css);
             } else {
-                self.createView();
+                $.extend(self.css, Mplayer.css);
+                Mplayer.createView(self);
             }
+
 
             if (self.playlist.length > 1) {
                 self.updatePlaylist();
@@ -81,7 +369,8 @@
             self.load(0);
 
             //以下两个方法都需要先正确获取 this.audio 元素之后才能正常工作。
-            self.defaultEventBinding().audioEventListener();
+            Mplayer.defaultEventBinding(self);
+            Mplayer.audioEventListener(self);
             self.audio[0].volume = 0.8;
             return this;
         },
@@ -205,78 +494,6 @@
             return this;
         },
 
-        createView: function () {
-            //缺省模式下自动生成GUI。也可以自写GUI。
-            var MGUI = {},
-                self = this,
-                length = this.playlist.length;
-
-            if (self.element.find(self.css.player).length > 0) {
-                throw new Error(Mplayer.message.isInitialized);
-            }
-
-            MGUI.mplayer = $("<div class='mplayer-" + self.index + " "+self.css.player.substring(1)+"'></div>");
-            MGUI.main = $("<div class='"+self.css.main.substring(1)+"'></div>");
-            MGUI.audio = $("<audio class='"+self.css.audio.substring(1)+"'></audio>");
-            MGUI.source = $("<source></source><source></source>");
-            MGUI.control = $("<div class='"+self.css.control.substring(1)+"'></div>");
-            MGUI.artist = $("<p class='icon-artist "+self.css.artist.substring(1)+"'></p>");
-            MGUI.title = $("<p class='icon-track "+self.css.title.substring(1)+"'></p>");
-            MGUI.progress = $("<span class='"+self.css.progressBar.substring(1)+"'></span>")
-                .append($("<span class='"+self.css.playedTime.substring(1)+"'></span>"));
-            MGUI.volume = $("<span class='"+self.css.volumeBar.substring(1)+"'></span>")
-                .append($("<span class='"+self.css.volumeValue.substring(1)+"'></span>"));
-            MGUI.mute = $("<span></span>")
-                .append("<a class='icon-mute "+self.css.mute.substring(1)+"' href='javascript:;'></a>");
-            MGUI.maxVolume = $("<span></span>")
-                .append($("<a class='icon-volume "+self.css.maxVolume.substring(1)+"' href='javascript:;'></a>"));
-            MGUI.time = $("<span class='icon-clock "+self.css.time.substring(1)+"'></span>")
-                .append($("<span class='"+self.css.currentTime.substring(1)+"'>-:--</span>"))
-                .append($("<span>/</span>"))
-                .append($("<span class='"+self.css.duration.substring(1)+"'>-:--</span>"));
-            MGUI.play = $("<span></span>")
-                .append($("<a class='icon-play "+self.css.play.substring(1)+"' href='javascript:;'></a>"));
-            MGUI.loop = $("<span></span>")
-                .append($("<a class='icon-repeat "+self.css.loop.substring(1)+"' href='javascript:;'></a>"));
-            MGUI.cover = $("<img class='"+self.css.cover.substring(1)+"' src=''>");
-
-            //当播放列表只有一首时，不生成以下元素。
-            MGUI.playlist = length > 1 ? $("<div class='"+self.css.playlist.substring(1)+"'></div>") : "";
-
-            MGUI.playlistMenu = length > 1 ? $("<span></span>")
-                .append($("<a class='icon-list "+self.css.playlistMenu.substring(1)+"' href='javascript:;'></a>")) : "";
-
-            MGUI.shuffle = length > 1 ? $("<span></span>")
-                .append($("<a class='icon-shuffle "+self.css.shuffle.substring(1)+"' href='javascript:;'></a>")) : "";
-
-            MGUI.next = length > 1 ? $("<span></span>")
-                .append($("<a class='icon-next "+self.css.next.substring(1)+"' href='javascript:;'></a>")) : "";
-
-            MGUI.prev = length > 1 ? $("<span></span>").
-                append($("<a class='icon-prev "+self.css.prev.substring(1)+"' href='javascript:;'></a>")) : "";
-
-
-            MGUI.audio.append(MGUI.source);
-            MGUI.control
-                .append(MGUI.artist)
-                .append(MGUI.title)
-                .append(MGUI.playlistMenu)
-                .append(MGUI.time)
-                .append(MGUI.progress)
-                .append(MGUI.prev)
-                .append(MGUI.play)
-                .append(MGUI.next)
-                .append(MGUI.mute)
-                .append(MGUI.volume)
-                .append(MGUI.maxVolume)
-                .append(MGUI.shuffle)
-                .append(MGUI.loop);
-            MGUI.main.append(MGUI.audio).append(MGUI.cover).append(MGUI.control);
-            self.element.append(MGUI.mplayer.append(MGUI.main).append(MGUI.playlist));
-
-            return this;
-        },
-
         updatePlaylist: function () {
             var self = this;
 
@@ -293,50 +510,9 @@
             });
 
             self.element.find(self.css.playlist+ " ul").append(
-                $("<li><a href='javascript:;' class='"+self.css.addBtn.substring(1)+"'>添加...</a></li>"))
+                $("<li><a href='javascript:;' class='"+self.css.addBtn.substring(1)+"'>添加...</a></li>"));
 
             return this;
-        },
-
-        css: {
-            player: ".mplayer",
-            main: ".mplayer-main",
-            playlist: ".mplayer-playlist",
-            audio: ".mplayer-audio",
-            control: ".mplayer-control",
-            play: ".mplayer-btn-play",
-            pause: ".mplayer-btn-pause",
-            next: ".mplayer-btn-next",
-            prev: ".mplayer-btn-prev",
-            loop: ".mplayer-btn-noloop",
-            singleLoop: ".mplayer-btn-single",
-            allLoop: ".mplayer-btn-all",
-            shuffle: ".mplayer-btn-shuffle",
-            song: ".mplayer-song",
-            current: ".mplayer-current",
-            cover: ".mplayer-cover",
-            title: ".mplayer-title",
-            artist: ".mplayer-artist",
-            progressBar: ".mplayer-progress",
-            playedTime: ".mplayer-played-time",
-            volumeBar: ".mplayer-volume",
-            volumeValue: ".mplayer-volume-value",
-            currentTime: ".mplayer-current-time",
-            duration: ".mplayer-duration",
-            time: ".mplayer-time",
-            mute: ".mplayer-mute",
-            maxVolume: ".mplayer-max-volum",
-            playlistMenu: ".mplayer-list",
-            deleteBtn: ".mplayer-delete-btn",
-            addBtn: ".mplayer-add-btn",
-            addAudio: ".mplayer-add",
-            addArtist: ".mplayer-add-artist",
-            addTitle: ".mplayer-add-title",
-            addCover: ".mplayer-add-cover",
-            addMp3: ".mplayer-add-mp3",
-            addOgg: ".mplayer-add-ogg",
-            addSubmit: ".mplayer-add-submit",
-            addCancel: ".mplayer-add-cancel"
         },
 
         delete: function (i) {
@@ -418,183 +594,6 @@
 
             return DMin+":"+DSec;
         },
-
-        defaultEventBinding: function () {
-            var e = this.element,
-                self = this;
-
-            var getPos = function (element) {
-                var acturalLeft = element.offsetLeft;
-                var acturalTop = element.offsetTop;
-                var current = element.offsetParent;
-                while(current !== null){
-                    acturalLeft = acturalLeft + current.offsetLeft;
-                    acturalTop = acturalTop + current.offsetTop;
-                    current = current.offsetParent;
-                }
-                return {
-                    left: acturalLeft,
-                    top: acturalTop
-                };
-            };
-
-            //使用事件委托，因为有些元素是经过脚本修改的，只有通过委托才能获取正确的元素。
-            e.find(self.css.control).on("click", self.css.play, function () {
-                self.switchTrack(self.currentTrack,true);
-            }).on("click", self.css.pause, function () {
-                self.pause();
-            }).on("click", self.css.next, function () {
-                self.next();
-            }).on("click", self.css.prev, function () {
-                self.prev();
-            }).on("click", self.css.loop, function () {
-                self.loop = "single";
-                $(this).removeClass(self.css.loop.substring(1)).addClass(self.css.singleLoop.substring(1));
-            }).on("click", self.css.singleLoop, function () {
-                self.loop = "all";
-                $(this).removeClass(self.css.singleLoop.substring(1)).addClass(self.css.allLoop.substring(1));
-            }).on("click", self.css.allLoop, function () {
-                self.loop = "false";
-                $(this).removeClass(self.css.allLoop.substring(1)).addClass(self.css.loop.substring(1));
-            }).on("click", self.css.shuffle, function () {
-                self.shuffle();
-            });
-
-            e.find(self.css.playlist).on("click", self.css.deleteBtn, function () {
-                self.delete($(self.css.deleteBtn).index($(this)));
-            }).on("click", self.css.addBtn, function () {
-                if ($(this).html() === "添加...") {
-                    var container = $("<div class='"+self.css.addAudio.substring(1)+"'></div>"),
-                        artist = $("<input class='"+self.css.addArtist.substring(1)+"' placeholder='歌手名字'>"),
-                        title = $("<input class='"+self.css.addTitle.substring(1)+"' placeholder='歌曲名字'>"),
-                        cover = $("<input class='"+self.css.addCover.substring(1)+"' placeholder='专辑封面地址'>"),
-                        mp3 = $("<input class='"+self.css.addMp3.substring(1)+"' placeholder='Mp3文件地址'>"),
-                        ogg = $("<input class='"+self.css.addOgg.substring(1)+"' placeholder='Ogg文件地址'>"),
-                        submit = $("<button class='"+self.css.addSubmit.substring(1)+"'>添加</button>"),
-                        cancel = $("<button class='"+self.css.addCancel.substring(1)+"'>取消</button>");
-                    container.append(artist).append(title).append(cover).append(mp3).append(ogg).append(submit).append(cancel);
-                    e.find(self.css.playlist).append(container);
-                    $(this).html("取消");
-                } else {
-                    e.find(self.css.addAudio).remove();
-                    $(this).html("添加...");
-                }
-            }).on("click", self.css.addSubmit ,function () {
-                var artist = e.find(self.css.addArtist).val(),
-                    title = e.find(self.css.addTitle).val(),
-                    cover = e.find(self.css.addCover).val(),
-                    mp3 = e.find(self.css.addMp3).val(),
-                    ogg = e.find(self.css.addOgg).val(),
-                    tmp = mp3 || ogg;
-
-                if (tmp) {
-                    if (artist || title || cover) {
-                        self.add({
-                            artist: artist,
-                            title: title,
-                            cover: cover,
-                            mp3: mp3,
-                            ogg: ogg
-                        });
-                    } else {
-                        self.add(tmp);
-                    }
-
-                } else {
-                    alert(Mplayer.message.itemInvalid);
-                    return false;
-                }
-            }).on("click", self.css.addCancel, function () {
-                e.find(self.css.addAudio).remove();
-                e.find(self.css.addBtn).html("添加...");
-            }).on("click", self.css.song, function () {
-                self.switchTrack(e.find(self.css.song).index($(this)));
-            });
-
-            e.find(self.css.progressBar).on("click", function (event) {
-                if (self.isPlaying) {
-                    var pos = event.pageX - getPos(this).left,
-                        width = $(self.css.progressBar).width();
-                    self.setProgress(self.audio[0].duration*(pos/width));
-                }
-            });
-
-            e.find(self.css.volumeBar).on("click", function (event) {
-                var pos = event.pageX - getPos(this).left,
-                    width = $(self.css.volumeBar).width();
-                self.setVolume(pos/width);
-            });
-
-            e.find(self.css.mute).on("click", function () {
-                self.setVolume(0);
-            });
-
-            e.find(self.css.maxVolume).on("click", function () {
-                self.setVolume(1);
-            });
-
-            e.find(self.css.playlistMenu).on("click", function ()  {
-                var playlist = e.find(self.css.playlist);
-                if (playlist.is(":animated")) {
-                    return false;
-                } else {
-                    playlist.slideToggle(400);
-                }
-                $(this).toggleClass("mplayer-btn-active");
-            });
-
-            return this;
-        },
-
-        audioEventListener: function () {
-            var self = this,
-                e = self.element;
-
-            self.audio.on("play", function () {
-                var currentTime,
-                    duration = self.audio[0].duration;
-                e.find(self.css.duration).html(self.getDuration());
-                update = setInterval(function () {
-                    currentTime = self.audio[0].currentTime;
-                    duration = self.audio[0].duration;
-                    e.find(self.css.currentTime).html(self.getCurrentTime());
-                    e.find(self.css.playedTime).css({"width":(currentTime/duration)*100+"%"});
-                    e.find(self.css.volumeValue).css({"width":self.audio[0].volume*4+"rem"});
-                },500);
-            }).on("pause", function () {
-                clearInterval(update);
-            });
-
-            self.audio.on("ended", function () {
-                if (self.loop === "single") {
-                    self.play();
-                } else {
-                    if (self.playlist.length === 1) {
-                        self.pause();
-                    } else {
-                        self.next();
-                    }
-                }
-            });
-
-            self.audio.on("playerOnChanged", function () {
-                if (self.isPlaying) {
-                    e.find(self.css.play)
-                        .removeClass(self.css.play.substring(1))
-                        .removeClass("icon-play")
-                        .addClass(self.css.pause.substring(1))
-                        .addClass("icon-pause");
-                } else {
-                    e.find(self.css.pause)
-                        .removeClass(self.css.pause.substring(1))
-                        .removeClass("icon-pause")
-                        .addClass(self.css.play.substring(1))
-                        .addClass("icon-play");
-                }
-            });
-            return this;
-        },
-
     };
 
     $.fn.Mplayer = function (list,css) {
