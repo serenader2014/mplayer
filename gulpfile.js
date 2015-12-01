@@ -8,7 +8,7 @@ gulp.task('deploy',  function () {
 });
 
 gulp.task('serve', ['compile', 'watch'], function () {
-    browserSync.init({ server: {baseDir: 'dist'}, port: 9000});
+    browserSync.init({ server: {baseDir: 'demo'}, port: 9000});
     gulp.watch('dist/**/*').on('change', browserSync.reload);
 });
 
@@ -23,12 +23,14 @@ gulp.task('compile:css', function () {
     return gulp.src('src/**/*.scss')
     .pipe($.sass({style: 'expanded'}))
     .pipe($.autoprefixer({browsers: ['last 2 versions']}))
-    .pipe(gulp.dest('demo/styles'));
+    .pipe(gulp.dest('demo/styles'))
+    .on('end', browserSync.reload);
 });
 
 gulp.task('compile:js', function () {
     return gulp.src('src/**/*.js')
-    .pipe(gulp.dest('demo/scripts'));
+    .pipe(gulp.dest('demo/scripts'))
+    .on('end', browserSync.reload);
 });
 
 gulp.task('default', ['serve']);
