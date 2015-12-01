@@ -1,4 +1,4 @@
-audios
-jquery.mplayer.js
 .sass-cache
-mbAudio.js
+node_modules
+demo/mp3
+.DS_Store
