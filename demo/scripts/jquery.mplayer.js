@@ -1,4 +1,5 @@
 ;(function ($, window, undefined) {
+    var slice = [].slice;
     function Mplayer (element, track, option) {
         var defaultOption = {
             autoPlay: false,
@@ -65,6 +66,35 @@
         return type;
     };
 
+    Mplayer.plugin = function (name, cb) {
+        Mplayer.pluginList = Mplayer.pluginList || {};
+        Mplayer.pluginList[name] = cb;
+    };
+
+    Mplayer.Error = function (type) {
+        var errorMap = {
+            'PLUGIN_NOT_FOUND': function (args) {
+                var name = args[0];
+                var allPluginsName = [];
+                $.each(Mplayer.pluginList, function (name) {
+                    allPluginsName.push(name);
+                });
+                this.message = 'Can not find the plugin ' + name;
+                this.description = 'Can not find the plugin "' + name 
+                            + '", current installed plugin(s) is(are): ' + allPluginsName.join(', ');
+                this.toString = function () {
+                    return this.description;
+                };
+            }
+        };
+
+        if (errorMap[type]) {
+            var args = slice.call(arguments, 1);
+            throw new errorMap[type](args);
+        }
+
+    };
+
     Mplayer.fn = Mplayer.prototype;
 
     Mplayer.fn.load = function () {
@@ -81,7 +111,7 @@
         var self = this;
         var attrs = '';
         $.each(self.option, function (name, value) {
-            if (value) {
+            if (value && name !== 'plugin') {
                 attrs += name + '=' + value + ' ';
             }
         });
@@ -89,7 +119,29 @@
         self.element.append(self.Mplayer);
         self.load();
         self.bindEvent();
+        self.loadPlugin();
         return this;
+    };
+
+    Mplayer.fn.loadPlugin = function () {
+        var self = this;
+        var pluginList = self.option.plugin || [];
+        var extend = function (obj) {
+            $.each(obj, function (name, cb) {
+                if (!Mplayer.fn[name]) {
+                    Mplayer.fn[name] = function () {
+                        return cb.apply(self, arguments);
+                    };
+                }
+            });
+        };
+        $.each(pluginList, function (name, option) {
+            if (Mplayer.pluginList[name]) {
+                Mplayer.pluginList[name].call(self, option, extend);
+            } else {
+                Mplayer.Error('PLUGIN_NOT_FOUND', name);
+            }
+        });
     };
 
     Mplayer.fn.bindEvent = function () {
@@ -104,10 +156,16 @@
             self.status = 'ended';
             self.emit('statusChanged', self.status);
         }).on('loadedmetadata', function () {
+            self.track.duration = self.Mplayer.get(0).duration;
             self.status = 'loaded';
             self.emit('statusChanged', self.status);
-            self.track.duration = self.Mplayer.get(0).duration;
-        }).on('progress', function () {
+        }).on('seeking', function () {
+            self.status = 'seeking';
+            self.emit('statusChanged', self.status);
+        }).on('seeked', function () {
+            self.status = 'seeked';
+            self.emit('statusChanged', self.status);
+        }).on('timeupdate', function () {
             self.track.currentTime = self.Mplayer.get(0).currentTime;
         });
     };
