@@ -66,7 +66,19 @@
         return type;
     };
 
-    Mplayer.plugin = function (name, cb) {
+    Mplayer.plugin = function (name, cb, option) {
+        if (option && option.require) {
+            var notFound = [];
+            $.each(option.require, function (index, plugin) {
+                if (!Mplayer.pluginList[plugin]) {
+                    notFound.push(plugin);
+                }
+            });
+            if (notFound.length) {
+                Mplayer.Error('REQUIRE_PLUGIN_NOT_FOUND', notFound, name);
+                return;
+            }
+        }
         Mplayer.pluginList = Mplayer.pluginList || {};
         Mplayer.pluginList[name] = cb;
     };
@@ -82,6 +94,16 @@
                 this.message = 'Can not find the plugin ' + name;
                 this.description = 'Can not find the plugin "' + name 
                             + '", current installed plugin(s) is(are): ' + allPluginsName.join(', ');
+                this.toString = function () {
+                    return this.description;
+                };
+            },
+            'REQUIRE_PLUGIN_NOT_FOUND': function (args) {
+                var list = args[0];
+                var name = args[1];
+                this.message = 'Can not find dependencies: ' + list.join(', ');
+                this.description = 'Can not find dependencies required by ' + name
+                                + ': ' + list.join(', ');
                 this.toString = function () {
                     return this.description;
                 };
