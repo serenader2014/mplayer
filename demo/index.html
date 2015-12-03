@@ -16,7 +16,6 @@
 
         <button onclick="test.play()">Play</button>
         <button onclick="test.pause()">Pause</button>
-        <button onclick="test.stop()">Stop</button>
 
         <script src="scripts/jquery-2.1.1.min.js"></script>
         <script src="scripts/jquery.mplayer.js"></script>
@@ -31,19 +30,11 @@
             },{
                 // autoPlay: true
             });
-            test.on('play', function () {
-                console.log('play');
-            }).on('progress', function () {
+            test.on('progress', function () {
                 var t = test.getProgress('[m]分[s]秒');
                 console.log(t);
-            }).on('stop', function () {
-                console.log('stop');
-            }).on('pause', function () {
-                console.log('pause');
-            }).on('seeked', function () {
-                console.log('seeked');
-            }).on('timeupdate', function () {
-                // console.log('timeUpdate');
+            }).on('statusChanged', function (event, status) {
+                console.log(status);
             });
         </script>
     </body>

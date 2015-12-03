@@ -1,5 +1,4 @@
 ;(function ($, window, undefined) {
-    var slice = [].slice;
     function Mplayer (element, track, option) {
         var defaultOption = {
             autoPlay: false,
@@ -97,13 +96,16 @@
         var self = this;
         this.on('play', function () {
             self.status = 'playing';
+            self.emit('statusChanged', self.status);
         }).on('pause', function () {
             self.status = 'pause';
+            self.emit('statusChanged', self.status);
         }).on('ended', function () {
             self.status = 'ended';
-        }).on('stop', function () {
-            self.status = 'stop';
+            self.emit('statusChanged', self.status);
         }).on('loadedmetadata', function () {
+            self.status = 'loaded';
+            self.emit('statusChanged', self.status);
             self.track.duration = self.Mplayer.get(0).duration;
         }).on('progress', function () {
             self.track.currentTime = self.Mplayer.get(0).currentTime;
@@ -119,13 +121,6 @@
     Mplayer.fn.pause = function () {
         this.emit('prePause');
         this.Mplayer.get(0).pause();
-        return this;
-    };
-
-    Mplayer.fn.stop = function () {
-        this.emit('preStop');
-        this.setProgress(0).pause();
-        this.emit('stop');
         return this;
     };
 
