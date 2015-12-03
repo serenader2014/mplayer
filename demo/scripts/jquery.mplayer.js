@@ -27,7 +27,6 @@
         $.extend(this.option, defaultOption, option);
         $.extend(this.track, defaultTrack, track);
         this.element = element;
-        this.eventList = {};
         this.status = 'pending';
     }
 
@@ -91,47 +90,23 @@
         self.element.append(self.Mplayer);
         self.load();
         self.bindEvent();
-        self.Mplayer
-        .on('play', function (event) {self.emit('play', event);})
-        .on('pause', function (event) {self.emit('pause', event);})
-        .on('ended', function (event) {self.emit('ended', event);})
-        .on('abort', function (event) {self.emit('abort', event);})
-        .on('canplay', function (event) {self.emit('canplay', event);})
-        .on('canplaythrough', function (event) {self.emit('canplaythrough', event);})
-        .on('durationchange', function (event) {self.emit('durationchange', event);})
-        .on('emptied', function (event) {self.emit('emptied', event);})
-        .on('error', function (event) {self.emit('error', event);})
-        .on('interruptbegin', function (event) {self.emit('interruptbegin', event);})
-        .on('interruptend', function (event) {self.emit('interruptend', event);})
-        .on('loadeddata', function (event) {self.emit('loadeddata', event);})
-        .on('loadedmetadata', function (event) {self.emit('loadedmetadata', event);})
-        .on('loadstart', function (event) {self.emit('loadstart', event);})
-        .on('playing', function (event) {self.emit('playing', event);})
-        .on('progress', function (event) {self.emit('progress', event);})
-        .on('ratechange', function (event) {self.emit('ratechange', event);})
-        .on('seeked', function (event) {self.emit('seeked', event);})
-        .on('stalled', function (event) {self.emit('stalled', event);})
-        .on('suspend', function (event) {self.emit('suspend', event);})
-        .on('timeupdate', function (event) {self.emit('timeupdate', event);})
-        .on('volumechange', function (event) {self.emit('volumechange', event);})
-        .on('waiting', function (event) {self.emit('waiting', event);});
-
         return this;
     };
 
     Mplayer.fn.bindEvent = function () {
+        var self = this;
         this.on('play', function () {
-            this.status = 'playing';
+            self.status = 'playing';
         }).on('pause', function () {
-            this.status = 'pause';
+            self.status = 'pause';
         }).on('ended', function () {
-            this.status = 'ended';
+            self.status = 'ended';
         }).on('stop', function () {
-            this.status = 'stop';
+            self.status = 'stop';
         }).on('loadedmetadata', function () {
-            this.track.duration = this.Mplayer.get(0).duration;
+            self.track.duration = self.Mplayer.get(0).duration;
         }).on('progress', function () {
-            this.track.currentTime = this.Mplayer.get(0).currentTime;
+            self.track.currentTime = self.Mplayer.get(0).currentTime;
         });
     };
 
@@ -183,40 +158,19 @@
         }
     };
 
-    Mplayer.fn.on = function (name, fn, context, once) {
-        this.eventList[name] = this.eventList[name] || [];
-        this.eventList[name].push({fn: fn, context: context || this, once: once});
+    Mplayer.fn.on = function () {
+        this.Mplayer.on.apply(this.Mplayer, arguments);
         return this;
     };
 
-    Mplayer.fn.emit = function (name) {
-        var arg = slice.call(arguments, 1);
-        if (this.eventList[name] && this.eventList[name].length) {
-            this.eventList[name].forEach(function (item) {
-                if (item.once && item.called) {
-                    return;
-                }
-                item.fn.apply(item.context, arg);
-                item.called = true;
-            });
-        }
+    Mplayer.fn.emit = function () {
+        this.Mplayer.trigger.apply(this.Mplayer, arguments);
+        return this;
     };
 
-    Mplayer.fn.off = function (name, fn) {
-        if (!this.eventList[name]) {
-            return;
-        }
-        if (!fn) {
-            this.eventList[name].splice(this.eventList[name].length);
-        } else {
-            for (var i = 0; i < this.eventList[name].length; i += 1) {
-                var handler = this.eventList[name][i];
-                if (handler.fn === fn) {
-                    this.eventList[name].splice(i, 1);
-                    i -= 1;
-                }
-            }
-        }
+    Mplayer.fn.off = function () {
+        this.Mplayer.off.apply(this.Mplayer, arguments);
+        return this;
     };
 
     $.fn.Mplayer = function (track, option) {
