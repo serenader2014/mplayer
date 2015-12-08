@@ -7,6 +7,7 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" type="text/css" href="styles/style.css">
+        <link rel="stylesheet" type="text/css" href="styles/jquery.mplayer.css">
         <link rel="stylesheet" type="text/css" href="styles/icon-font.css">
     </head>
     <body>
@@ -15,8 +16,6 @@
         <div class="test3"></div>
         <script src="scripts/jquery-2.1.1.min.js"></script>
         <script src="scripts/jquery.mplayer.js"></script>
-        <script src="scripts/plugin/gui.js"></script>
-        <script src="scripts/plugin/multi-track.js"></script>
         <script type="text/javascript">
             var test = $('.test1').Mplayer({
                 mp3: '/mp3/Adie-Seek You.mp3',
@@ -26,11 +25,6 @@
                 album: 'Adie',
                 title: 'Seek You'
             },{
-                plugin: {
-                    GUI: {
-                        config: true
-                    },
-                },
                 // volume: 0.2
                 // autoPlay: true
             });

@@ -7,7 +7,6 @@
             buffered: false,
             loop: false,
             preload: false,
-            volume: 0.8
         };
         var defaultTrack = {
             mp3: null,
@@ -137,12 +136,37 @@
                 attrs += name + '=' + value + ' ';
             }
         });
+        self.loadPlugin();
         self.Mplayer = $('<audio ' + attrs + '></audio>');
-        self.element.append(self.Mplayer);
+        self.renderGUI();
         self.load();
         self.bindEvent();
-        self.loadPlugin();
         return this;
+    };
+
+    Mplayer.fn.renderGUI = function () {
+        this.element.append(this.Mplayer).append(this.getTemplate());
+        return this;
+    };
+
+    Mplayer.fn.getTemplate = function () {
+        var template = ['<div class="mplayer">',
+                        '<img src="${{cover}}" alt="" class="mplayer-track-cover">',
+                        '<div class="mplayer-track-info"><p class="mplayer-track-title">${{title}}</p>',
+                        '<p><span class="mplayer-track-artist">${{artist}}</span> - ',
+                        '<span class="mplayer-track-album">${{album}}</span></p>',
+                        '<div class="mplayer-progress-bar"><span class="mplayer-time-num">',
+                        '<span class="mplayer-current-time-num">${{currentTime}}</span>/',
+                        '<span class="mplayer-duration-num">${{duration}}</span>',
+                        '</span><div class="mplayer-duration">',
+                        '<div class="mplayer-current-time"></div></div>',
+                        '</div></div>',
+                        '<div class="mplayer-control">',
+                        '<button class="mplayer-play mplayer-btn icon-play"></button>',
+                        '<button class="mplayer-pause mplayer-btn icon-pause"></button>',
+                        '</div>',
+                    '</div>'].join('');
+        return Mplayer.tmpl(template)(this.track);
     };
 
     Mplayer.fn.loadPlugin = function () {
@@ -168,7 +192,7 @@
 
     Mplayer.fn.bindEvent = function () {
         var self = this;
-        this.on('play', function () {
+        self.on('play', function () {
             self.status = 'playing';
             self.emit('statusChanged', self.status);
         }).on('pause', function () {
@@ -189,6 +213,32 @@
             self.emit('statusChanged', self.status);
         }).on('timeupdate', function () {
             self.track.currentTime = self.Mplayer.get(0).currentTime;
+            var percentage = Math.floor(100*self.track.currentTime/self.track.duration);
+            self.element.find('.mplayer-current-time-num').html(self.getProgress('[m]:[s]'));
+            if (percentage !== self.element.find('.mplayer-current-time').width()) {
+                self.element.find('.mplayer-current-time')
+                    .css({width: percentage + '%'});
+            }
+        }).on('statusChanged', function (event, status) {
+            if (status === 'loaded') {
+                self.element.find('.mplayer-duration-num').html(self.getDuration('[m]:[s]'));
+                self.element.find('.mplayer-current-time-num').html(Mplayer.parseTime(0));
+            }
+            if (status === 'playing') {
+                self.element.find('.mplayer-play').hide().end().find('.mplayer-pause').show();
+            } else {
+                self.element.find('.mplayer-play').show().end().find('.mplayer-pause').hide();
+            }
+        });
+
+        self.element.find('.mplayer-play').on('click', function () {
+            if (self.status !== 'playing') {
+                self.play();
+            }
+        }).end().find('.mplayer-pause').on('click', function () {
+            if (self.status === 'playing') {
+                self.pause();
+            }
         });
     };
 
