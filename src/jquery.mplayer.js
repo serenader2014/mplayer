@@ -1,5 +1,25 @@
 ;(function ($, window, undefined) {
     var slice = [].slice;
+    var template = ['<div class="mplayer">',
+                '<img src="${{cover}}" alt="" class="mplayer-track-cover">',
+                '<div class="mplayer-track-info"><p title="${{title}}" ',
+                'class="mplayer-track-title">${{title}}</p>',
+                '<p><span class="mplayer-track-artist">${{artist}}</span> - ',
+                '<span class="mplayer-track-album">${{album}}</span></p>',
+                '<div class="mplayer-progress-bar"><span class="mplayer-time-num">',
+                '<span class="mplayer-current-time-num">${{currentTimeNum}}</span>/',
+                '<span class="mplayer-duration-num">${{durationNum}}</span>',
+                '</span><div class="mplayer-duration">',
+                '<div class="mplayer-current-time"></div></div>',
+                '</div><div class="mplayer-volume"><button class="icon-volume"></button>',
+                '<div class="mplayer-volume-wrapper"><div class="mplayer-full-volume">',
+                '<div class="mplayer-current-volume"></div>',
+                '</div></div></div></div><div class="mplayer-control">',
+                '<button class="mplayer-play mplayer-btn icon-play"></button>',
+                '<button class="mplayer-pause mplayer-btn icon-pause"></button>',
+                '</div>',
+            '</div>'].join('');
+    var templateData;
     function Mplayer (element, track, option) {
         var defaultOption = {
             autoPlay: false,
@@ -36,7 +56,7 @@
         string.replace(/\${{(.*?)}}|$/g, function (origin, str, offset) {
             source += string.slice(index, offset).replace(/"/g, '\\"');
             index = offset + origin.length;
-            source += '"+' + (str || '""') + '+"';
+            source += '"+(typeof ' + (str || '""') + '!=="undefined" ? ' + (str || '""') +':"")+"';
         });
         source = 'with(obj){\n' + source + '";\n}\nreturn text;';
         try {
@@ -138,35 +158,22 @@
         });
         self.loadPlugin();
         self.Mplayer = $('<audio ' + attrs + '></audio>');
-        self.renderGUI();
         self.load();
-        self.bindEvent();
+        self.renderGUI(self.track);
+        self.bindAudioEvent();
         return this;
     };
 
-    Mplayer.fn.renderGUI = function () {
-        this.element.append(this.Mplayer).append(this.getTemplate());
+    Mplayer.fn.renderGUI = function (obj) {
+        this.element.get(0).innerHTML = this.getTemplate(obj);
+        this.updateGUIVolume(1);
+        this.bindDOMEvent();
         return this;
     };
 
-    Mplayer.fn.getTemplate = function () {
-        var template = ['<div class="mplayer">',
-                        '<img src="${{cover}}" alt="" class="mplayer-track-cover">',
-                        '<div class="mplayer-track-info"><p class="mplayer-track-title">${{title}}</p>',
-                        '<p><span class="mplayer-track-artist">${{artist}}</span> - ',
-                        '<span class="mplayer-track-album">${{album}}</span></p>',
-                        '<div class="mplayer-progress-bar"><span class="mplayer-time-num">',
-                        '<span class="mplayer-current-time-num">${{currentTime}}</span>/',
-                        '<span class="mplayer-duration-num">${{duration}}</span>',
-                        '</span><div class="mplayer-duration">',
-                        '<div class="mplayer-current-time"></div></div>',
-                        '</div></div>',
-                        '<div class="mplayer-control">',
-                        '<button class="mplayer-play mplayer-btn icon-play"></button>',
-                        '<button class="mplayer-pause mplayer-btn icon-pause"></button>',
-                        '</div>',
-                    '</div>'].join('');
-        return Mplayer.tmpl(template)(this.track);
+    Mplayer.fn.getTemplate = function (obj) {
+        templateData = obj;
+        return Mplayer.tmpl(template)(obj);
     };
 
     Mplayer.fn.loadPlugin = function () {
@@ -190,7 +197,7 @@
         });
     };
 
-    Mplayer.fn.bindEvent = function () {
+    Mplayer.fn.bindAudioEvent = function () {
         var self = this;
         self.on('play', function () {
             self.status = 'playing';
@@ -203,6 +210,9 @@
             self.emit('statusChanged', self.status);
         }).on('loadedmetadata', function () {
             self.track.duration = self.Mplayer.get(0).duration;
+            self.track.durationNum = Mplayer.parseTime(self.track.duration);
+            self.track.currentTimeNum = Mplayer.parseTime(0);
+            self.renderGUI(self.track);
             self.status = 'loaded';
             self.emit('statusChanged', self.status);
         }).on('seeking', function () {
@@ -213,32 +223,61 @@
             self.emit('statusChanged', self.status);
         }).on('timeupdate', function () {
             self.track.currentTime = self.Mplayer.get(0).currentTime;
-            var percentage = Math.floor(100*self.track.currentTime/self.track.duration);
-            self.element.find('.mplayer-current-time-num').html(self.getProgress('[m]:[s]'));
-            if (percentage !== self.element.find('.mplayer-current-time').width()) {
-                self.element.find('.mplayer-current-time')
-                    .css({width: percentage + '%'});
-            }
+            self.updateGUITime(self.track.currentTime);
         }).on('statusChanged', function (event, status) {
-            if (status === 'loaded') {
-                self.element.find('.mplayer-duration-num').html(self.getDuration('[m]:[s]'));
-                self.element.find('.mplayer-current-time-num').html(Mplayer.parseTime(0));
-            }
-            if (status === 'playing') {
-                self.element.find('.mplayer-play').hide().end().find('.mplayer-pause').show();
-            } else {
-                self.element.find('.mplayer-play').show().end().find('.mplayer-pause').hide();
-            }
+            self.updateGUIButton(status);
+        }).on('volumechange', function () {
+            self.updateGUIVolume(self.Mplayer.get(0).volume);
         });
+    };
 
+    Mplayer.fn.updateGUIVolume = function (volume) {
+        var percentage = (volume*100).toString() + '%';
+        this.element.find('.mplayer-current-volume').css({
+            width: percentage
+        });
+    };
+
+    Mplayer.fn.updateGUITime = function (time) {
+        this.element.find('.mplayer-current-time-num').get(0).innerHTML = Mplayer.parseTime(time);
+        this.element.find('.mplayer-current-time').css({
+            width: Math.floor(100*this.track.currentTime/this.track.duration).toString() + '%'
+        });
+    };
+
+    Mplayer.fn.updateGUIButton = function (status) {
+        if (status === 'playing') {
+            this.element.find('.mplayer-play').hide().end().find('.mplayer-pause').show();
+        } else if (status === 'pause') {
+            this.element.find('.mplayer-play').show().end().find('.mplayer-pause').hide();
+        }
+    };
+
+    Mplayer.fn.bindDOMEvent = function () {
+        var self = this;
         self.element.find('.mplayer-play').on('click', function () {
-            if (self.status !== 'playing') {
-                self.play();
-            }
+            self.play();
         }).end().find('.mplayer-pause').on('click', function () {
-            if (self.status === 'playing') {
-                self.pause();
-            }
+            self.pause();
+        }).end().find('.mplayer-progress-bar').on('click', function (event) {
+            var pos = event.pageX - $(this).offset().left;
+            var width = $(this).width();
+            self.setProgress(self.track.duration*pos/width);
+        }).end().find('.mplayer-volume-wrapper').on('click', function (event) {
+            event.stopPropagation();
+            var pos = event.pageX - $(this).offset().left;
+            var width = $(this).width();
+            self.setVolume(pos/width);
+        }).end().find('.icon-volume').on('click', function (event) {
+            event.stopPropagation();
+            var volumeBar = self.element.find('.mplayer-full-volume');
+            var doc = $(window);
+            volumeBar.css({width: 50});
+            var hideVolume = function () {
+                doc.off('click', hideVolume);
+                volumeBar.css({width: 0});
+            };
+            doc.on('click', hideVolume);
         });
     };
 
@@ -271,7 +310,6 @@
     Mplayer.fn.setVolume = function (vol) {
         this.emit('preVolumechange');
         this.Mplayer.get(0).volume = vol;
-        this.option.volume = vol;
         return this;
     };
 

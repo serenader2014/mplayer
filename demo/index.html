@@ -28,10 +28,8 @@
                 // volume: 0.2
                 // autoPlay: true
             });
-            test.setVolume(0.2);
+            // test.setVolume(0.2);
             test.on('timeupdate', function () {
-                var t = test.getProgress('[m]分[s]秒');
-                console.log(t);
             }).on('statusChanged', function (event, status) {
                 console.log(status);
             });
