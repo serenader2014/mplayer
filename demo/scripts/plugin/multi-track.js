@@ -60,10 +60,12 @@
                 var self = this;
                 self.isShuffle = !self.isShuffle;
                 if (self.isShuffle) {
-                    self.originalList = self.originalList || [];
-                    self.playlist.forEach(function (item, index) {
-                        self.originalList[index] = item;
-                    });
+                    if (!self.originalList) {
+                        self.originalList = [];
+                        self.playlist.forEach(function (item, index) {
+                            self.originalList[index] = item;
+                        });
+                    }
                     //Fisher-Yates Shuffle Algorithm
                     var k, t, l = self.playlist.length;
                     if (l < 2) {
@@ -80,7 +82,9 @@
                         self.element.find('.mplayer-shuffle').removeClass('mplayer-no-shuffle');
                     }, 50);
                 } else {
-                    self.playlist = self.originalList;
+                    self.originalList.forEach(function (item, index) {
+                        self.playlist[index] = item;
+                    });
                     self.loadTrack(0);
                     setTimeout(function () {
                         self.element.find('.mplayer-shuffle').addClass('mplayer-no-shuffle');
