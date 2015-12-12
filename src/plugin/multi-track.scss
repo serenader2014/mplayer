@@ -1,0 +1,64 @@
+.mplayer-has-playlist {
+    height: auto;
+    .mplayer-track-info {
+        p {
+            padding: 0;
+            text-align: left;
+        }
+    }
+    .mplayer-control {
+        position: static;
+        text-align: center;
+        padding: 5px 0;
+        margin: 0 -10px;
+        background: #efefef;
+        .mplayer-btn {
+            margin: 0 5px;
+        }
+    }
+    .mplayer-playlist {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+    }
+    .mplayer-track {
+        position: relative;
+        padding: 5px 0;
+        margin-left: 15px;
+        border-bottom: 1px solid #eee;
+        font-size: 12px;
+        cursor: pointer;
+        &:last-child {
+            border-bottom: none;
+        }
+    }
+    .mplayer-current {
+        .mplayer-order {
+            left: -17px;
+        }
+        .icon-play {
+            color: #b02101;
+        }
+    }
+    .mplayer-order {
+        position: absolute;
+        left: -15px;
+        color: #999;
+    }
+    .mplayer-list-artist {
+        margin-left: 5px;
+        color: #999;
+    }
+    .mplayer-no-repeat, .mplayer-no-shuffle {
+        background: #ccc;
+    }
+    .mplayer-single-repeat {
+        position: relative;
+        &:after {
+            content: '1';
+            position: absolute;
+            top: 10px;
+            left: 16px;
+        }
+    }
+}

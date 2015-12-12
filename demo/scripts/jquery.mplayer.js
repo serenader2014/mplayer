@@ -1,5 +1,24 @@
 ;(function ($, window, undefined) {
     var slice = [].slice;
+    var template = ['<div class="mplayer">',
+                '<img src="${{cover}}" alt="" class="mplayer-track-cover">',
+                '<div class="mplayer-track-info"><p title="${{title}}" ',
+                'class="mplayer-track-title">${{title}}</p>',
+                '<p><span class="mplayer-track-artist">${{artist}}</span> - ',
+                '<span class="mplayer-track-album">${{album}}</span></p>',
+                '<div class="mplayer-progress-bar"><span class="mplayer-time-num">',
+                '<span class="mplayer-current-time-num">${{currentTimeNum}}</span>/',
+                '<span class="mplayer-duration-num">${{durationNum}}</span>',
+                '</span><div class="mplayer-duration">',
+                '<div class="mplayer-current-time"></div></div>',
+                '</div><div class="mplayer-volume"><button class="icon-volume"></button>',
+                '<div class="mplayer-volume-wrapper"><div class="mplayer-full-volume">',
+                '<div class="mplayer-current-volume"></div>',
+                '</div></div></div></div><div class="mplayer-control">',
+                '<button class="mplayer-play mplayer-btn icon-play"></button>',
+                '<button class="mplayer-pause mplayer-btn icon-pause"></button>',
+                '</div>',
+            '</div>'].join('');
     function Mplayer (element, track, option) {
         var defaultOption = {
             autoPlay: false,
@@ -28,25 +47,6 @@
         this.element = element;
         this.status = 'pending';
     }
-    Mplayer.GUITemplate = ['<div class="mplayer">',
-                '<img src="${{cover}}" alt="" class="mplayer-track-cover">',
-                '<div class="mplayer-track-info"><p title="${{title}}" ',
-                'class="mplayer-track-title">${{title}}</p>',
-                '<p><span class="mplayer-track-artist">${{artist}}</span> - ',
-                '<span class="mplayer-track-album">${{album}}</span></p>',
-                '<div class="mplayer-progress-bar"><span class="mplayer-time-num">',
-                '<span class="mplayer-current-time-num">${{currentTimeNum}}</span>/',
-                '<span class="mplayer-duration-num">${{durationNum}}</span>',
-                '</span><div class="mplayer-duration">',
-                '<div class="mplayer-current-time"></div></div>',
-                '</div><div class="mplayer-volume"><button class="icon-volume"></button>',
-                '<div class="mplayer-volume-wrapper"><div class="mplayer-full-volume">',
-                '<div class="mplayer-current-volume"></div>',
-                '</div></div></div></div><div class="mplayer-control">',
-                '<button class="mplayer-play mplayer-btn icon-play"></button>',
-                '<button class="mplayer-pause mplayer-btn icon-pause"></button>',
-                '</div>',
-            '</div>'].join('');
 
     Mplayer.tmpl = function (string) {
         var index = 0;
@@ -165,13 +165,14 @@
 
     Mplayer.fn.renderGUI = function (obj) {
         this.element.get(0).innerHTML = this.getTemplate(obj);
-        this.updateGUIVolume(1);
+        this.updateGUIVolume();
+        this.updateGUIVolume(this.Mplayer.get(0).volume);
         this.bindDOMEvent();
         return this;
     };
 
     Mplayer.fn.getTemplate = function (obj) {
-        return Mplayer.tmpl(Mplayer.GUITemplate)(obj);
+        return Mplayer.tmpl(template)(obj);
     };
 
     Mplayer.fn.loadPlugin = function () {

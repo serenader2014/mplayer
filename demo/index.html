@@ -8,17 +8,18 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" type="text/css" href="styles/style.css">
         <link rel="stylesheet" type="text/css" href="styles/jquery.mplayer.css">
+        <link rel="stylesheet" type="text/css" href="styles/plugin/multi-track.css">
         <link rel="stylesheet" type="text/css" href="styles/icon-font.css">
     </head>
     <body>
-        <div class="test1"></div>
-        <div class="test2"></div>
-        <div class="test3"></div>
+        <div class="test test1"></div>
+        <div class="test test2"></div>
+        <div class="test test3"></div>
         <script src="scripts/jquery-2.1.1.min.js"></script>
         <script src="scripts/jquery.mplayer.js"></script>
         <script src="scripts/plugin/multi-track.js"></script>
         <script type="text/javascript">
-            var test = $('.test1').Mplayer({},{
+            var test1 = $('.test1').Mplayer({},{
                 plugin: {
                     multiTrack: {
                         option: true,
@@ -36,14 +37,57 @@
                             artist: 'Dylan Mondegreen',
                             album: 'Dylan Mondegreen',
                             title: 'Something To Dream On'
-                        }]
+                        },{
+                            mp3: '/mp3/Embrace-Gravity.mp3',
+                            ogg: '/mp3/Embrace-Gravity.OGG',
+                            cover: '/mp3/Embrace-Gravity.jpg',
+                            artist: 'Embrace',
+                            album: 'Embrace',
+                            title: 'Gravity'
+                        },{
+                            mp3: '/mp3/Jocelyn Pook-Loving Strangers.mp3',
+                            ogg: '/mp3/Jocelyn Pook-Loving Strangers.OGG',
+                            cover: '/mp3/Jocelyn Pook-Loving Strangers.jpg',
+                            artist: 'Jocelyn Pook',
+                            album: 'Jocelyn Pook',
+                            title: 'Loving Strangers'
+                        },{
+                            mp3: '/mp3/Julia Fordham-Happy Ever After.mp3',
+                            ogg: '/mp3/Julia Fordham-Happy Ever After.OGG',
+                            cover: '/mp3/Julia Fordham-Happy Ever After.jpg',
+                            artist: 'Julia Fordham',
+                            album: 'Julia Fordham',
+                            title: 'Happy Ever After'
+                        },{
+                            mp3: '/mp3/Maria Haukaas Storeng-Precious to me.mp3',
+                            ogg: '/mp3/Maria Haukaas Storeng-Precious to me.OGG',
+                            cover: '/mp3/Maria Haukaas Storeng-Precious to me.jpg',
+                            artist: 'Maria Haukaas',
+                            album: 'Maria Haukaas',
+                            title: 'Precious to me'
+                        },{
+                            mp3: '/mp3/The Unisex-Remind Me.mp3',
+                            ogg: '/mp3/The Unisex-Remind Me.OGG',
+                            cover: '/mp3/The Unisex-Remind Me.jpg',
+                            artist: 'The Unisex',
+                            album: 'The Unisex',
+                            title: 'Remind Me'
+                        },]
                     }
                 }
             });
             // test.setVolume(0.2);
-            test.on('timeupdate', function () {
+            test1.on('timeupdate', function () {
             }).on('statusChanged', function (event, status) {
                 console.log(status);
+            });
+            var test2 = $('.test2').Mplayer({
+                mp3: '/mp3/Dylan Mondegreen-Something To Dream On.mp3',
+                ogg: '/mp3/Dylan Mondegreen-Something To Dream On.OGG',
+                cover: '/mp3/Dylan Mondegreen-Something To Dream On.jpg',
+                artist: 'Dylan Mondegreen',
+                album: 'Dylan Mondegreen',
+                title: 'Something To Dream On'
             });
         </script>
     </body>

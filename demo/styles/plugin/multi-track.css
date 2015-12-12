@@ -1,0 +1,46 @@
+.mplayer-has-playlist {
+  height: auto; }
+  .mplayer-has-playlist .mplayer-track-info p {
+    padding: 0;
+    text-align: left; }
+  .mplayer-has-playlist .mplayer-control {
+    position: static;
+    text-align: center;
+    padding: 5px 0;
+    margin: 0 -10px;
+    background: #efefef; }
+    .mplayer-has-playlist .mplayer-control .mplayer-btn {
+      margin: 0 5px; }
+  .mplayer-has-playlist .mplayer-playlist {
+    padding: 0;
+    margin: 0;
+    list-style: none; }
+  .mplayer-has-playlist .mplayer-track {
+    position: relative;
+    padding: 5px 0;
+    margin-left: 15px;
+    border-bottom: 1px solid #eee;
+    font-size: 12px;
+    cursor: pointer; }
+    .mplayer-has-playlist .mplayer-track:last-child {
+      border-bottom: none; }
+  .mplayer-has-playlist .mplayer-current .mplayer-order {
+    left: -17px; }
+  .mplayer-has-playlist .mplayer-current .icon-play {
+    color: #b02101; }
+  .mplayer-has-playlist .mplayer-order {
+    position: absolute;
+    left: -15px;
+    color: #999; }
+  .mplayer-has-playlist .mplayer-list-artist {
+    margin-left: 5px;
+    color: #999; }
+  .mplayer-has-playlist .mplayer-no-repeat, .mplayer-has-playlist .mplayer-no-shuffle {
+    background: #ccc; }
+  .mplayer-has-playlist .mplayer-single-repeat {
+    position: relative; }
+    .mplayer-has-playlist .mplayer-single-repeat:after {
+      content: '1';
+      position: absolute;
+      top: 10px;
+      left: 16px; }
