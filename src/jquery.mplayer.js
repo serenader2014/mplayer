@@ -1,25 +1,5 @@
 ;(function ($, window, undefined) {
     var slice = [].slice;
-    var template = ['<div class="mplayer">',
-                '<img src="${{cover}}" alt="" class="mplayer-track-cover">',
-                '<div class="mplayer-track-info"><p title="${{title}}" ',
-                'class="mplayer-track-title">${{title}}</p>',
-                '<p><span class="mplayer-track-artist">${{artist}}</span> - ',
-                '<span class="mplayer-track-album">${{album}}</span></p>',
-                '<div class="mplayer-progress-bar"><span class="mplayer-time-num">',
-                '<span class="mplayer-current-time-num">${{currentTimeNum}}</span>/',
-                '<span class="mplayer-duration-num">${{durationNum}}</span>',
-                '</span><div class="mplayer-duration">',
-                '<div class="mplayer-current-time"></div></div>',
-                '</div><div class="mplayer-volume"><button class="icon-volume"></button>',
-                '<div class="mplayer-volume-wrapper"><div class="mplayer-full-volume">',
-                '<div class="mplayer-current-volume"></div>',
-                '</div></div></div></div><div class="mplayer-control">',
-                '<button class="mplayer-play mplayer-btn icon-play"></button>',
-                '<button class="mplayer-pause mplayer-btn icon-pause"></button>',
-                '</div>',
-            '</div>'].join('');
-    var templateData;
     function Mplayer (element, track, option) {
         var defaultOption = {
             autoPlay: false,
@@ -48,6 +28,25 @@
         this.element = element;
         this.status = 'pending';
     }
+    Mplayer.GUITemplate = ['<div class="mplayer">',
+                '<img src="${{cover}}" alt="" class="mplayer-track-cover">',
+                '<div class="mplayer-track-info"><p title="${{title}}" ',
+                'class="mplayer-track-title">${{title}}</p>',
+                '<p><span class="mplayer-track-artist">${{artist}}</span> - ',
+                '<span class="mplayer-track-album">${{album}}</span></p>',
+                '<div class="mplayer-progress-bar"><span class="mplayer-time-num">',
+                '<span class="mplayer-current-time-num">${{currentTimeNum}}</span>/',
+                '<span class="mplayer-duration-num">${{durationNum}}</span>',
+                '</span><div class="mplayer-duration">',
+                '<div class="mplayer-current-time"></div></div>',
+                '</div><div class="mplayer-volume"><button class="icon-volume"></button>',
+                '<div class="mplayer-volume-wrapper"><div class="mplayer-full-volume">',
+                '<div class="mplayer-current-volume"></div>',
+                '</div></div></div></div><div class="mplayer-control">',
+                '<button class="mplayer-play mplayer-btn icon-play"></button>',
+                '<button class="mplayer-pause mplayer-btn icon-pause"></button>',
+                '</div>',
+            '</div>'].join('');
 
     Mplayer.tmpl = function (string) {
         var index = 0;
@@ -156,8 +155,8 @@
                 attrs += name + '=' + value + ' ';
             }
         });
-        self.loadPlugin();
         self.Mplayer = $('<audio ' + attrs + '></audio>');
+        self.loadPlugin();
         self.load();
         self.renderGUI(self.track);
         self.bindAudioEvent();
@@ -172,13 +171,12 @@
     };
 
     Mplayer.fn.getTemplate = function (obj) {
-        templateData = obj;
-        return Mplayer.tmpl(template)(obj);
+        return Mplayer.tmpl(Mplayer.GUITemplate)(obj);
     };
 
     Mplayer.fn.loadPlugin = function () {
         var self = this;
-        var pluginList = self.option.plugin || [];
+        var pluginList = self.option.plugin || {};
         var extend = function (obj) {
             $.each(obj, function (name, cb) {
                 if (!Mplayer.fn[name]) {
@@ -215,12 +213,19 @@
             self.renderGUI(self.track);
             self.status = 'loaded';
             self.emit('statusChanged', self.status);
+        }).on('loadeddata', function () {
+            self.status = 'loadeddata';
+            self.emit('statusChanged', self.status);            
         }).on('seeking', function () {
+            self.prevStatus = self.status;
             self.status = 'seeking';
             self.emit('statusChanged', self.status);
         }).on('seeked', function () {
             self.status = 'seeked';
             self.emit('statusChanged', self.status);
+            self.status = self.prevStatus;
+            self.emit('statusChanged', self.status);
+            delete self.prevStatus;
         }).on('timeupdate', function () {
             self.track.currentTime = self.Mplayer.get(0).currentTime;
             self.updateGUITime(self.track.currentTime);
@@ -323,6 +328,11 @@
 
     Mplayer.fn.on = function () {
         this.Mplayer.on.apply(this.Mplayer, arguments);
+        return this;
+    };
+
+    Mplayer.fn.one = function () {
+        this.Mplayer.one.apply(this.Mplayer, arguments);
         return this;
     };
 

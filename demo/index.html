@@ -16,17 +16,29 @@
         <div class="test3"></div>
         <script src="scripts/jquery-2.1.1.min.js"></script>
         <script src="scripts/jquery.mplayer.js"></script>
+        <script src="scripts/plugin/multi-track.js"></script>
         <script type="text/javascript">
-            var test = $('.test1').Mplayer({
-                mp3: '/mp3/Adie-Seek You.mp3',
-                ogg: '/mp3/Adie-Seek You.OGG',
-                cover: '/mp3/Adie-Seek You.jpg',
-                artist: 'Adie',
-                album: 'Adie',
-                title: 'Seek You'
-            },{
-                // volume: 0.2
-                // autoPlay: true
+            var test = $('.test1').Mplayer({},{
+                plugin: {
+                    multiTrack: {
+                        option: true,
+                        list: [{
+                            mp3: '/mp3/Adie-Seek You.mp3',
+                            ogg: '/mp3/Adie-Seek You.OGG',
+                            cover: '/mp3/Adie-Seek You.jpg',
+                            artist: 'Adie',
+                            album: 'Adie',
+                            title: 'Seek You'
+                        },{
+                            mp3: '/mp3/Dylan Mondegreen-Something To Dream On.mp3',
+                            ogg: '/mp3/Dylan Mondegreen-Something To Dream On.OGG',
+                            cover: '/mp3/Dylan Mondegreen-Something To Dream On.jpg',
+                            artist: 'Dylan Mondegreen',
+                            album: 'Dylan Mondegreen',
+                            title: 'Something To Dream On'
+                        }]
+                    }
+                }
             });
             // test.setVolume(0.2);
             test.on('timeupdate', function () {
