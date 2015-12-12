@@ -78,17 +78,11 @@
                         self.playlist[k] = t;
                     }
                     self.loadTrack(0);
-                    setTimeout(function () {
-                        self.element.find('.mplayer-shuffle').removeClass('mplayer-no-shuffle');
-                    }, 50);
                 } else {
                     self.originalList.forEach(function (item, index) {
                         self.playlist[index] = item;
                     });
                     self.loadTrack(0);
-                    setTimeout(function () {
-                        self.element.find('.mplayer-shuffle').addClass('mplayer-no-shuffle');
-                    }, 50);
                 }
             }
         });
