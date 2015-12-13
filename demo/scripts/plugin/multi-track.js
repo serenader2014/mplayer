@@ -30,6 +30,12 @@
         if (!option.list || !option.list.length) {
             throw new Error('No playlist.');
         }
+        var defaultOption = {
+            repeat: false,
+            shuffle: false,
+            list: []
+        };
+        var opt = $.extend({}, defaultOption, option);
         var self = this;
         extend({
             next: function () {
@@ -87,9 +93,14 @@
             }
         });
         self.currentTrack = 0;
-        self.playlist = option.list;
-        self.repeat = false;
+        self.playlist = opt.list;
+        self.repeat = opt.repeat;
         self.isShuffle = false;
+        if (opt.shuffle) {
+            self.one('loadeddata', function () {
+                self.shuffle();
+            });
+        }
         self.on('ended', function () {
             if (self.repeat === 'single') {
                 self.play();
@@ -154,7 +165,20 @@
                 self.shuffle();
             }).end().find('.mplayer-repeat').on('click', function () {
                 self.repeat = self.repeat === 'single' ? false : (self.repeat ? 'single' : true);
-                self.renderGUI(self.track);
+                var element = self.element.find('.mplayer-repeat');
+                if (self.repeat === 'single') {
+                    element
+                        .removeClass('mplayer-no-repeat')
+                        .addClass('mplayer-single-repeat');
+                } else if (!self.repeat) {
+                    element
+                        .removeClass('mplayer-single-repeat')
+                        .addClass('mplayer-no-repeat');
+                } else {
+                    element
+                        .removeClass('mplayer-no-repeat')
+                        .removeClass('mplayer-single-repeat');
+                }
             }).end().find('.mplayer-track').on('click', function () {
                 var list = self.element.find('.mplayer-track');
                 var index = list.index(this);
