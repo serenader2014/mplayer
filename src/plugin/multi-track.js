@@ -104,14 +104,19 @@
             var track = self.playlist[index];
             if (typeof track === 'string') {
                 self.parseID3(track, function (err, tags) {
-                    self.playlist[index] = {
-                        mp3: track,
-                        ogg: track,
-                        title: tags.title,
-                        album: tags.album,
-                        artist: tags.artist,
-                        cover: tags.cover
-                    };
+                    if (err) {
+                        console.error('Getting "' + track + '" info failed: ' + err.error + ' error');
+                        self.playlist[index] = $.extend({}, Mplayer.defaultTrack);
+                    } else {
+                        self.playlist[index] = {
+                            mp3: track,
+                            ogg: track,
+                            title: tags.title,
+                            album: tags.album,
+                            artist: tags.artist,
+                            cover: tags.cover
+                        };
+                    }
                     if (index === 0) {
                         self.track = $.extend({}, self.playlist[0]);
                         self.load();

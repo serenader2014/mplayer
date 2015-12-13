@@ -44,6 +44,8 @@
         this.init();
     }
 
+    Mplayer.defaultTrack = defaultTrack;
+
     Mplayer.tmpl = function (string) {
         var index = 0;
         var source = 'var text="';
