@@ -1,4 +1,12 @@
+html, body {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+}
 .test {
-    width: 980px;
+    max-width: 980px;
     margin: 20px auto;
+}
+.mplayer {
+    margin: 0 auto;
 }

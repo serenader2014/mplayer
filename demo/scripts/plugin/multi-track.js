@@ -53,6 +53,9 @@
             loadTrack: function (index) {
                 var track = this.playlist[index];
                 var self = this;
+                if (typeof track === 'string') {
+                    track = {mp3: track};
+                } 
                 self.currentTrack = index;
                 $.extend(self.track, track);
                 self.load();
@@ -96,6 +99,36 @@
         self.playlist = opt.list;
         self.repeat = opt.repeat;
         self.isShuffle = false;
+        var count = 0;
+        function loadTrackInfo (index) {
+            var track = self.playlist[index];
+            if (typeof track === 'string') {
+                self.parseID3(track, function (err, tags) {
+                    self.playlist[index] = {
+                        mp3: track,
+                        ogg: track,
+                        title: tags.title,
+                        album: tags.album,
+                        artist: tags.artist,
+                        cover: tags.cover
+                    };
+                    if (index === 0) {
+                        self.track = $.extend({}, self.playlist[0]);
+                        self.load();
+                    }
+                    if (index < self.playlist.length - 1) {
+                        loadTrackInfo(count += 1);
+                    }
+                    self.renderGUI(self.track);
+                });
+            } else {
+                if (index < self.playlist.length - 1) {
+                    loadTrackInfo(count += 1);
+                }
+            }
+        }
+        loadTrackInfo(count);
+
         if (opt.shuffle) {
             self.one('loadeddata', function () {
                 self.shuffle();
@@ -120,7 +153,6 @@
                 self.play();
             });
         });
-        $.extend(self.track, option.list[self.currentTrack]);
         self.getTemplate = function () {
             var obj = $.extend({}, self.track);
             var str = '';
@@ -128,19 +160,23 @@
                 var trackClass = '';
                 var order = index + 1;
                 if (index === self.currentTrack) {
-                    trackClass = 'mplayer-current';
+                    trackClass = ' mplayer-current';
                     order = '<div class="icon-play"></div>';
                 }
                 str = [str, 
-                '<li class="mplayer-track ',
+                '<li class="mplayer-track',
                 trackClass,
-                '"><span class="mplayer-order">',
+                '" title="',
+                track.title,
+                ' - ',
+                track.artist,
+                '"><div><div class="mplayer-order">',
                 order,
-                '</span><span class="mplayer-list-title">',
+                '</div><span class="mplayer-list-title">',
                 track.title,
                 '</span><span class="mplayer-list-artist">',
                 track.artist,
-                '</li>'
+                '</div></li>'
                 ].join('');
             });
             obj.playlist = str;

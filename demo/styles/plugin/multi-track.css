@@ -17,20 +17,32 @@
     list-style: none; }
   .mplayer-has-playlist .mplayer-track {
     position: relative;
-    padding: 5px 0;
-    margin-left: 15px;
-    border-bottom: 1px solid #eee;
+    margin: 0 -10px;
     font-size: 12px;
     cursor: pointer; }
-    .mplayer-has-playlist .mplayer-track:last-child {
+    .mplayer-has-playlist .mplayer-track > div {
+      padding: 5px 0;
+      margin: 0 10px 0 25px;
+      white-space: nowrap;
+      border-bottom: 1px solid #eee;
+      overflow: hidden;
+      text-overflow: ellipsis; }
+    .mplayer-has-playlist .mplayer-track:last-child > div {
       border-bottom: none; }
-  .mplayer-has-playlist .mplayer-current .mplayer-order {
-    left: -17px; }
-  .mplayer-has-playlist .mplayer-current .icon-play {
-    color: #b02101; }
+  .mplayer-has-playlist .mplayer-current {
+    background: #b02101;
+    color: #fff; }
+    .mplayer-has-playlist .mplayer-current > div {
+      border-bottom: none; }
+    .mplayer-has-playlist .mplayer-current .icon-play {
+      color: #fff; }
+    .mplayer-has-playlist .mplayer-current .mplayer-list-artist {
+      color: #ccc; }
   .mplayer-has-playlist .mplayer-order {
     position: absolute;
-    left: -15px;
+    width: 15px;
+    text-align: center;
+    left: 4px;
     color: #999; }
   .mplayer-has-playlist .mplayer-list-artist {
     margin-left: 5px;

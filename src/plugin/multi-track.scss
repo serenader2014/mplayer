@@ -23,26 +23,41 @@
     }
     .mplayer-track {
         position: relative;
-        padding: 5px 0;
-        margin-left: 15px;
-        border-bottom: 1px solid #eee;
+        margin: 0 -10px;
         font-size: 12px;
         cursor: pointer;
+        > div {
+            padding: 5px 0;
+            margin: 0 10px 0 25px;
+            white-space: nowrap;
+            border-bottom: 1px solid #eee;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
         &:last-child {
-            border-bottom: none;
+            > div {
+                border-bottom: none;
+            }
         }
     }
     .mplayer-current {
-        .mplayer-order {
-            left: -17px;
-        }
+        background: #b02101;
+        color: #fff;
+        > div {
+            border-bottom: none;
+        } 
         .icon-play {
-            color: #b02101;
+            color: #fff;
+        }
+        .mplayer-list-artist {
+            color: #ccc;
         }
     }
     .mplayer-order {
         position: absolute;
-        left: -15px;
+        width: 15px;
+        text-align: center;
+        left: 4px;
         color: #999;
     }
     .mplayer-list-artist {
