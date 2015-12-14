@@ -8,9 +8,16 @@
     text-align: center;
     padding: 5px 0;
     margin: 0 -10px;
-    background: #efefef; }
+    background: #f1f1f1;
+    width: auto;
+    height: auto; }
     .mplayer-has-playlist .mplayer-control .mplayer-btn {
-      margin: 0 5px; }
+      margin: 0 5px;
+      background: #b02101;
+      border: none;
+      font-size: 12px;
+      width: 25px;
+      height: 25px; }
   .mplayer-has-playlist .mplayer-playlist {
     padding: 0;
     margin: 0;

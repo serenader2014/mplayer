@@ -12,15 +12,21 @@
 
 .mplayer-control {
   position: absolute;
-  top: 10px;
-  right: 10px; }
+  top: 5px;
+  left: 10px;
+  width: 50px;
+  height: 50px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.2); }
   .mplayer-control .mplayer-btn {
-    width: 25px;
-    height: 25px;
-    border: none;
+    width: 35px;
+    height: 35px;
+    margin: 7.5px 0;
+    border: 2px solid #eee;
     color: #fff;
-    background: #b02101;
+    font-size: 20px;
     border-radius: 50%;
+    background: none;
     cursor: pointer; }
 
 .mplayer-pause {
@@ -31,16 +37,16 @@
   padding-left: 55px;
   text-align: center;
   font-size: 12px;
-  color: #999; }
+  color: #6f6f6f; }
   .mplayer-track-info p {
-    padding: 0 25px 0 0;
+    padding: 0;
     margin: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis; }
 
 .mplayer-track-title {
-  color: #444;
+  color: #3c3c3c;
   font-size: 14px; }
 
 .mplayer-track-cover {
@@ -51,7 +57,7 @@
 .mplayer-time-num {
   position: absolute;
   right: 0;
-  top: -8px;
+  top: -10px;
   font-size: 11px; }
 
 .mplayer-progress-bar {
@@ -82,12 +88,12 @@
     width: 6px;
     height: 6px;
     background: #fff;
-    border: 1px solid #ccc;
+    border: 1px solid #d5d5d5;
     border-radius: 50%; }
 
 .mplayer-volume {
   position: absolute;
-  bottom: 5px;
+  bottom: 7px;
   left: 50px; }
   .mplayer-volume .icon-volume {
     border: none;

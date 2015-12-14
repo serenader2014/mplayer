@@ -1,26 +1,38 @@
+$color-red: #b02101;
+$color-light-gray: #fbfbfb;
+$color-gray: #eee;
+$color-dark-black: #555;
+$color-white: #fff;
+
 .mplayer {
     position: relative;
     width: 300px;
     height: 50px;
     padding: 5px 10px;
     border-radius: 5px;
-    border: 1px solid #eee;
-    color: #555;
+    border: 1px solid $color-gray;
+    color: $color-dark-black;
     font-family: Arial;
-    background: #fbfbfb;
+    background: $color-light-gray;
     box-shadow: 0 5px 18px rgba(0,0,0,0.2);
 }
 .mplayer-control {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 5px;
+    left: 10px;
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    background: rgba(0,0,0,0.2);
     .mplayer-btn {
-        width: 25px;
-        height: 25px;
-        border: none;
-        color: #fff;
-        background: #b02101;
+        width: 35px;
+        height: 35px;
+        margin: 7.5px 0;
+        border: 2px solid $color-gray;
+        color: $color-white;
+        font-size: 20px;
         border-radius: 50%;
+        background: none;
         cursor: pointer;
     }
 }
@@ -34,9 +46,9 @@
     padding-left: 55px;
     text-align: center;
     font-size: 12px;
-    color: #999;
+    color: lighten($color-dark-black, 10%);
     p {
-        padding: 0 25px 0 0;
+        padding: 0;
         margin: 0;
         white-space: nowrap;
         overflow: hidden;
@@ -45,7 +57,7 @@
 }
 
 .mplayer-track-title {
-    color: #444;
+    color: darken($color-dark-black, 10%);
     font-size: 14px;
 }
 
@@ -58,7 +70,7 @@
 .mplayer-time-num {
     position: absolute;
     right: 0;
-    top: -8px;
+    top: -10px;
     font-size: 11px;
 }
 
@@ -96,15 +108,15 @@
         content: '';
         width: 6px;
         height: 6px;
-        background: #fff;
-        border: 1px solid #ccc;
+        background: $color-white;
+        border: 1px solid darken($color-gray, 10%);
         border-radius: 50%;
     }
 }
 
 .mplayer-volume {
     position: absolute;
-    bottom: 5px;
+    bottom: 7px;
     left: 50px;
     .icon-volume {
         border: none;

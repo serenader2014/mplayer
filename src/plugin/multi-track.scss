@@ -1,3 +1,9 @@
+$color-red: #b02101;
+$color-light-gray: #fbfbfb;
+$color-gray: #eee;
+$color-dark-black: #555;
+$color-white: #fff;
+
 .mplayer-has-playlist {
     height: auto;
     .mplayer-track-info {
@@ -11,9 +17,16 @@
         text-align: center;
         padding: 5px 0;
         margin: 0 -10px;
-        background: #efefef;
+        background: lighten($color-gray, 1%);
+        width: auto;
+        height: auto;
         .mplayer-btn {
             margin: 0 5px;
+            background: $color-red;
+            border: none;
+            font-size: 12px;
+            width: 25px;
+            height: 25px;
         }
     }
     .mplayer-playlist {
