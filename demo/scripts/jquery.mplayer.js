@@ -232,8 +232,8 @@
         var pluginList = self.option.plugin || {};
         var extend = function (obj) {
             $.each(obj, function (name, cb) {
-                if (!Mplayer.fn[name]) {
-                    Mplayer.fn[name] = function () {
+                if (!self[name]) {
+                    self[name] = function () {
                         return cb.apply(self, arguments);
                     };
                 }
